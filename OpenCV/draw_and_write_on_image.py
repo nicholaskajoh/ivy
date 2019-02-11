@@ -1,6 +1,6 @@
 import cv2
 
-img = cv2.imread('me-shouting.jpg', cv2.IMREAD_COLOR)
+img = cv2.imread('./images/me-shouting.jpg', cv2.IMREAD_COLOR)
 cv2.line(img, (0, 0), (150, 150), (0, 255, 255), 5)
 cv2.rectangle(img, (20, 20), (300, 300), (255, 0, 255), 10)
 cv2.circle(img, (350, 350), 100, (255, 255, 0), 5)
