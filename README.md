@@ -13,3 +13,6 @@ The project was developed using the Python programming language and OpenCV (an o
 
 ## Setup
 TODO
+
+## How it works
+TODO
