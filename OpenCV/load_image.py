@@ -1,6 +1,6 @@
 import cv2
 
-img = cv2.imread('./images/me-shouting.jpg', cv2.IMREAD_GRAYSCALE) # alternatively IMREAD_COLOR or IMREAD_UNCHANGED
+img = cv2.imread('./images/me.jpg', cv2.IMREAD_GRAYSCALE) # alternatively IMREAD_COLOR or IMREAD_UNCHANGED
 cv2.imshow('Nicholas Kajoh', img)
 
 # press any key to exit

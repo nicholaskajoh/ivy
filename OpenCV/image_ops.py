@@ -1,6 +1,6 @@
 import cv2
 
-img = cv2.imread('./images/me-shouting.jpg', cv2.IMREAD_COLOR)
+img = cv2.imread('./images/me.jpg', cv2.IMREAD_COLOR)
 
 pixel = img[50, 50]
 print(pixel)
