@@ -8,11 +8,11 @@ The project was developed using the Python programming language and OpenCV (an o
 
 ## Requirements
 - Python 3
-- OpenCV
-- Numpy
 
 ## Setup
-TODO
+- Clone this repo `git@github.com:nicholaskajoh/Vehicle-Counting.git`.
+- Run `pip install -r requirements.txt` to install dependencies.
+- Run `python {{PYTHON_FILE}}`. 
 
 ## How it works
 TODO
