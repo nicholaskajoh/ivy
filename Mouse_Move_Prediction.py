@@ -18,19 +18,19 @@ def predict_next_position(previous_mouse_positions):
         delta_xs = []
         delta_ys = []
         j = n - 10 if n - 10 > 0 else 0 # calculate deltas from a max of 10 prev positions
+        c = n - 1 - j;
         for i in range(n - 1, j, -1):
-            delta_x = previous_mouse_positions[i][0] - previous_mouse_positions[i - 1][0]
+            delta_x = (previous_mouse_positions[i][0] - previous_mouse_positions[i - 1][0]) * c
             delta_xs.append(delta_x)
-            delta_y = previous_mouse_positions[i][1] - previous_mouse_positions[i - 1][1]
+            delta_y = (previous_mouse_positions[i][1] - previous_mouse_positions[i - 1][1]) * c
             delta_ys.append(delta_y)
+            c -= 1
         average_delta_x = sum(delta_xs) / float(len(delta_xs))
         average_delta_y = sum(delta_ys) / float(len(delta_ys))
         return (
             round(previous_mouse_positions[n - 1][0] + average_delta_x),
             round(previous_mouse_positions[n - 1][1] + average_delta_y),
         )
-
-    return 
 
 def draw_cross(image, position, color):
     cv2.line(image, (position[0] - 5, position[1] - 5), (position[0] + 5, position[1] + 5), color, 2)
