@@ -58,6 +58,9 @@ while True:
                     dist = np.linalg.norm(np.array(box_centroid) - np.array(blob.centroid))
                     if dist <= 5: # 5 pixels
                         match_found = True
+                        tracker = cv2.TrackerKCF_create()
+                        tracker.init(frame, tuple(box))
+                        blob.update(box, tracker)
                         break
 
                 if not match_found:

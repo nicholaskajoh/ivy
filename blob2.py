@@ -10,6 +10,8 @@ class Blob:
         self.tracker = _tracker
         self.num_consecutive_tracking_failures = 0
 
-    def update(self, _bounding_box):
+    def update(self, _bounding_box, _tracker=None):
         self.bounding_box = _bounding_box
         self.centroid = get_centroid(_bounding_box)
+        if _tracker:
+            self.tracker = _tracker
