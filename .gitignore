@@ -1,1 +1,3 @@
 *.pyc
+video_data/
+yolov3.weights
