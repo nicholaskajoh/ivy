@@ -5,12 +5,12 @@ import numpy as np
 def get_bounding_boxes(image):
     # get object classes
     classes = None
-    with open('classes-tiny.txt', 'r') as classes_file:
+    with open('classes.txt', 'r') as classes_file:
         classes = [line.strip() for line in classes_file.readlines()]
     classes_of_interest = ['bicycle', 'car', 'motorcycle', 'bus', 'truck']
     
     # create a YOLO v3 DNN model using pre-trained weights
-    net = cv2.dnn.readNet('yolov3-tiny.weights', 'yolov3-tiny.cfg')
+    net = cv2.dnn.readNet('yolov3.weights', 'yolov3.cfg')
     
     # create image blob
     scale = 0.00392
