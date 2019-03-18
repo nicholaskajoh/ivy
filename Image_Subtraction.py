@@ -34,7 +34,7 @@ while True:
         # cv2.imshow('threshold image', threshold_image)
 
         # find and draw contours on image
-        _, contours, _ = cv2.findContours(threshold_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(threshold_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(threshold_image, contours, -1, (255, 255, 255), -1)
 
         cv2.imshow('contours', threshold_image)
