@@ -3,6 +3,8 @@ from blob2 import Blob, get_centroid, box_contains_point, get_area
 import numpy as np
 from collections import OrderedDict
 from yolo_detector import get_bounding_boxes
+import uuid
+import os
 
 cap = cv2.VideoCapture('./video_data/sample_traffic_scene.mp4')
 
@@ -27,6 +29,7 @@ counting_line = [(0, cl_y), (f_width, cl_y)]
 vehicle_count = 0
 
 while True:
+    k = cv2.waitKey(1)
     if cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
         _, frame = cap.read()
         
@@ -100,13 +103,18 @@ while True:
         cv2.imshow('tracking', resized_frame)
 
         frame_counter += 1
+
+        # save frame if 's' key is pressed
+        if k & 0xFF == ord('s'):
+            cv2.imwrite(os.path.join('screenshots', 'ss_' + uuid.uuid4().hex + '.png'), frame)
+            print('Screenshot taken.')
     else:
         print('End of video.')
         # end video loop if on the last frame
         break
 
     # end video loop if 'q' key is pressed
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if k & 0xFF == ord('q'):
         print('Video exited.')
         break
 
