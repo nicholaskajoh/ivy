@@ -1,6 +1,6 @@
 import cv2
 
-cap = cv2.VideoCapture('../videos/CarsDrivingUnderBridge.mp4')
+cap = cv2.VideoCapture('../videos/sample_traffic_scene.mp4')
 bg_subtractor = cv2.createBackgroundSubtractorMOG2()
 
 while True:
