@@ -1,5 +1,6 @@
 *.pyc
-video_data/
 yolov3.weights
 screenshots/*
 !screenshots/.gitkeep
+videos/*
+!videos/.gitkeep

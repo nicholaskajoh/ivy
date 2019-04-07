@@ -1,10 +1,10 @@
 import cv2
-from blob3 import Blob, get_centroid
+from blobs.blob3 import Blob, get_centroid
 import numpy as np
 from collections import OrderedDict
-from yolo_detector import get_bounding_boxes
+from detectors.yolo_detector import get_bounding_boxes
 
-cap = cv2.VideoCapture('./video_data/sample_traffic_scene.mp4') # ./CarsDrivingUnderBridge.mp4
+cap = cv2.VideoCapture('./videos/sample_traffic_scene.mp4') # ./CarsDrivingUnderBridge.mp4
 
 blobs = OrderedDict()
 blob_id = 1

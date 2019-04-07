@@ -1,9 +1,9 @@
 import cv2
-from blob2 import Blob, get_centroid
+from blobs.blob2 import Blob, get_centroid
 import numpy as np
 from collections import OrderedDict
 
-cap = cv2.VideoCapture('./video_data/sample_traffic_scene.mp4')
+cap = cv2.VideoCapture('./videos/sample_traffic_scene.mp4')
 
 blobs = OrderedDict()
 blob_id = 1
@@ -12,7 +12,7 @@ DETECTION_FRAME_RATE = 48
 MAX_CONSECUTIVE_TRACKING_FAILURES = 15
 
 def get_bounding_boxes(_frame):
-    fullbody_cascade = cv2.CascadeClassifier('./OpenCV/HaarCascades/car.xml')
+    fullbody_cascade = cv2.CascadeClassifier('./HaarCascades/car.xml')
     gray = cv2.cvtColor(_frame, cv2.COLOR_BGR2GRAY)
     _bounding_boxes = fullbody_cascade.detectMultiScale(gray)
     return _bounding_boxes
@@ -40,7 +40,7 @@ while True:
                 # draw and label bounding boxes
                 (x, y, w, h) = [int(v) for v in box]
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-                cv2.putText(frame, 'person' + str(_id), (x, y - 2), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+                cv2.putText(frame, 'vehicle_' + str(_id), (x, y - 2), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
             else:
                 blob.num_consecutive_tracking_failures += 1
 
