@@ -5,6 +5,16 @@ from collections import OrderedDict
 from detectors.yolo_detector import get_bounding_boxes
 import uuid
 import os
+import contextlib
+from datetime import datetime
+
+
+log_file_name = 'log.txt'
+with contextlib.suppress(FileNotFoundError):
+    os.remove(log_file_name)
+log_file = open(log_file_name, 'a')
+log_file.write('vehicle_id, count, datetime\n')
+log_file.flush()
 
 cap = cv2.VideoCapture('./videos/sample_traffic_scene.mp4')
 
@@ -56,8 +66,10 @@ while True:
                 vehicle_count += 1
 
                 # log count data to a file (vehicle_id, count, datetime)
-                
-                
+                _row = '{0}, {1}, {2}\n'.format('v_' + str(_id), vehicle_count, datetime.now())
+                log_file.write(_row)
+                log_file.flush()
+
 
         if frame_counter >= DETECTION_FRAME_RATE:
             # rerun detection
@@ -125,3 +137,4 @@ while True:
 # end capture, close window
 cap.release()
 cv2.destroyAllWindows()
+log_file.close()

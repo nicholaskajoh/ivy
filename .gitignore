@@ -4,3 +4,4 @@ screenshots/*
 !screenshots/.gitkeep
 videos/*
 !videos/.gitkeep
+log.txt
