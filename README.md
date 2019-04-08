@@ -17,5 +17,5 @@ Traffic congestion is a major challenge in many cities around the world, especia
 ## How it works
 The vehicle counting system is made up of three main components: a detector, tracker and counter. The detector identifies vehicles in a given frame of video and returns a list of bounding boxes around the vehicles to the tracker. The tracker uses the bounding boxes to obtain regions of interest (ROIs) and uses them to track the vehicles in subsequent frames. The detector is also used to update tracker objects periodically to ensure that they are still tracking the vehicles correctly. The counter draws a counting lines across the road. When a vehicle crosses the line, the vehicle count is incremented.
 
-# Sample video files
+## Sample video files
 Download link: https://drive.google.com/drive/folders/1h8ANowkfm4TXGDg7R5Z6rnosySVc-Ht7?usp=sharing.
