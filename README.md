@@ -9,6 +9,7 @@ Traffic congestion is a major challenge in many cities around the world, especia
 ## Setup
 - Install Python 3 on your machine. 
 - Clone this repo `git@github.com:nicholaskajoh/Vehicle-Counting.git`.
+- Download the the pre-trained YOLO weight file [here (237 MB)](https://pjreddie.com/media/files/yolov3.weights) and place it in the [detectors folder](/detectors)
 - Get video footage of a traffic scene (*see link to sample video below*).
 - Create and/or use a virtual environment.
 - Run `pip install -r requirements.txt` to install dependencies.
