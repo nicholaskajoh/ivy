@@ -7,8 +7,9 @@ My final year project (B.Sc Computer Science).
 Traffic congestion is a major challenge in many cities around the world, especially cities in developing nations where road networks are poorly designed and cities overpopulated. Collecting quality data about the flow of traffic is crucial in traffic management, as jams can be anticipated and prevented, and vehicles can be intelligently directed to routes with less traffic. This project aims to improve the traffic situation on, and condition of Nigerian roads by implementing a vehicle counting system that provides accurate data for traffic control agencies and systems. The significances of this system include estimating traffic flow on a given road per time, predicting future traffic conditions, understanding traffic patterns and the factors that affect them, and optimizing existing manual traffic management systems. The project was developed using the Python programming language and OpenCV (an open-source library of programming functions mainly aimed at real-time Computer Vision).
 
 ## Setup
-- Install Python 3 on your machine. 
+- Install Python 3 on your machine.
 - Clone this repo `git@github.com:nicholaskajoh/Vehicle-Counting.git`.
+- Download the [YOLO v3 weights](https://pjreddie.com/media/files/yolov3.weights) and place it in the [detectors folder](/detectors).
 - Get video footage of a traffic scene (*see link to sample video below*).
 - Create and/or use a virtual environment.
 - Run `pip install -r requirements.txt` to install dependencies.
