@@ -7,7 +7,12 @@ import uuid
 import os
 import contextlib
 from datetime import datetime
+import argparse
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('video', help='relative/absolute path to video of traffic scene')
+args = parser.parse_args()
 
 log_file_name = 'log.txt'
 with contextlib.suppress(FileNotFoundError):
@@ -16,7 +21,7 @@ log_file = open(log_file_name, 'a')
 log_file.write('vehicle_id, count, datetime\n')
 log_file.flush()
 
-cap = cv2.VideoCapture('./videos/sample_traffic_scene.mp4')
+cap = cv2.VideoCapture(args.video)
 
 blobs = OrderedDict()
 blob_id = 1
