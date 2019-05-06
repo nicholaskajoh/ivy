@@ -8,12 +8,27 @@ import os
 import contextlib
 from datetime import datetime
 import argparse
+from utils.detection_roi import get_roi_frame, draw_roi
 
 
+# parse CLI arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('video', help='relative/absolute path to video of traffic scene')
+parser.add_argument('--droi', help='specify a detection region of interest (ROI) \
+                    i.e a set of vertices that represent the area (polygon) \
+                    where you want detections to be made (format: 1,2|3,4|5,6|7,8|9,10 \
+                    default: 0,0|frame_width,0|frame_width,frame_height|0,frame_height \
+                    [i.e the whole video frame])')
+parser.add_argument('--showdroi', action='store_true', help='display/overlay the detection roi on the video')
+parser.add_argument('--mctf', type=int, help='maximum consecutive tracking failures \
+                    i.e number of tracking failures before the tracker concludes \
+                    the tracked object has left the frame')
+parser.add_argument('--di', type=int, help='detection interval i.e number of frames \
+                    before detection is carried out again (in order to find new vehicles \
+                    and update the trackers of old ones)')
 args = parser.parse_args()
 
+# open log file
 log_file_name = 'log.txt'
 with contextlib.suppress(FileNotFoundError):
     os.remove(log_file_name)
@@ -22,26 +37,37 @@ log_file.write('vehicle_id, count, datetime\n')
 log_file.flush()
 
 cap = cv2.VideoCapture(args.video)
+_, frame = cap.read()
 
 blobs = OrderedDict()
 blob_id = 1
 frame_counter = 0
-DETECTION_FRAME_RATE = 5
-MAX_CONSECUTIVE_TRACKING_FAILURES = 10
+DETECTION_INTERVAL = 10 if args.di == None else args.di
+MAX_CONSECUTIVE_TRACKING_FAILURES = 10 if args.mctf == None else args.mctf
+f_height, f_width, _ = frame.shape
+
+# set counting line
+cl_y = round(4 / 5 * f_height)
+counting_line = [(0, cl_y), (f_width, cl_y)]
+vehicle_count = 0
+
+# create detection ROI
+droi = [(0, 0), (f_width, 0), (f_width, f_height), (0, f_height)]
+if args.droi:
+    droi = []
+    points = args.droi.replace(' ', '').split('|')
+    for point_str in points:
+        point = tuple(map(int, point_str.split(',')))
+        droi.append(point)
 
 # initialize trackers and create new blobs
-_, frame = cap.read()
-initial_bboxes = get_bounding_boxes(frame)
+droi_frame = get_roi_frame(frame, droi)
+initial_bboxes = get_bounding_boxes(droi_frame)
 for box in initial_bboxes:
     tracker = cv2.TrackerCSRT_create()
     tracker.init(frame, tuple(box))
     _blob = Blob(box, tracker)
     blobs[blob_id] = _blob
-
-f_height, f_width, _ = frame.shape
-cl_y = round(4 / 5 * f_height)
-counting_line = [(0, cl_y), (f_width, cl_y)]
-vehicle_count = 0
 
 while True:
     k = cv2.waitKey(1)
@@ -75,10 +101,10 @@ while True:
                 log_file.write(_row)
                 log_file.flush()
 
-
-        if frame_counter >= DETECTION_FRAME_RATE:
+        if frame_counter >= DETECTION_INTERVAL:
             # rerun detection
-            boxes = get_bounding_boxes(frame)
+            droi_frame = get_roi_frame(frame, droi)
+            boxes = get_bounding_boxes(droi_frame)
             
             # add new blobs
             for box in boxes:
@@ -119,6 +145,10 @@ while True:
 
         # display vehicle count
         cv2.putText(frame, 'Count: ' + str(vehicle_count), (20, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2, cv2.LINE_AA)
+
+        # show detection roi
+        if args.showdroi:
+            frame = draw_roi(frame, droi)
 
         resized_frame = cv2.resize(frame, (858, 480))
         cv2.imshow('tracking', resized_frame)
