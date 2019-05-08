@@ -2,7 +2,7 @@ import cv2
 from blobs.blob2 import Blob, get_centroid, box_contains_point, get_area
 import numpy as np
 from collections import OrderedDict
-from detectors.yolo_detector import get_bounding_boxes
+from detectors.detector import get_bounding_boxes
 import uuid
 import os
 import contextlib
@@ -26,6 +26,8 @@ parser.add_argument('--mctf', type=int, help='maximum consecutive tracking failu
 parser.add_argument('--di', type=int, help='detection interval i.e number of frames \
                     before detection is carried out again (in order to find new vehicles \
                     and update the trackers of old ones)')
+parser.add_argument('--detector', help='select a model/algorithm to use for vehicle detection \
+                    (options: yolo, haarc, bgsub | default: yolo)')
 args = parser.parse_args()
 
 # open log file
@@ -36,6 +38,7 @@ log_file = open(log_file_name, 'a')
 log_file.write('vehicle_id, count, datetime\n')
 log_file.flush()
 
+# capture traffic scene video from file
 cap = cv2.VideoCapture(args.video)
 _, frame = cap.read()
 
@@ -44,6 +47,7 @@ blob_id = 1
 frame_counter = 0
 DETECTION_INTERVAL = 10 if args.di == None else args.di
 MAX_CONSECUTIVE_TRACKING_FAILURES = 10 if args.mctf == None else args.mctf
+detector = 'yolo' if args.detector == None else args.detector
 f_height, f_width, _ = frame.shape
 
 # set counting line
@@ -62,7 +66,7 @@ if args.droi:
 
 # initialize trackers and create new blobs
 droi_frame = get_roi_frame(frame, droi)
-initial_bboxes = get_bounding_boxes(droi_frame)
+initial_bboxes = get_bounding_boxes(droi_frame, detector)
 for box in initial_bboxes:
     tracker = cv2.TrackerCSRT_create()
     tracker.init(frame, tuple(box))
@@ -104,7 +108,7 @@ while True:
         if frame_counter >= DETECTION_INTERVAL:
             # rerun detection
             droi_frame = get_roi_frame(frame, droi)
-            boxes = get_bounding_boxes(droi_frame)
+            boxes = get_bounding_boxes(droi_frame, detector)
             
             # add new blobs
             for box in boxes:
