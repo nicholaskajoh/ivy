@@ -1,9 +1,12 @@
+import sys
+sys.path.append('..')
+
 import cv2
 from blobs.blob2 import Blob, get_centroid
 import numpy as np
 from collections import OrderedDict
 
-cap = cv2.VideoCapture('./videos/PeopleWalking.avi')
+cap = cv2.VideoCapture('../videos/PeopleWalking.avi')
 
 blobs = OrderedDict()
 blob_id = 1
@@ -12,7 +15,7 @@ DETECTION_FRAME_RATE = 48
 MAX_CONSECUTIVE_TRACKING_FAILURES = 15
 
 def get_bounding_boxes(_frame):
-    fullbody_cascade = cv2.CascadeClassifier('./HaarCascades/fullbody.xml')
+    fullbody_cascade = cv2.CascadeClassifier('../HaarCascades/fullbody.xml')
     gray = cv2.cvtColor(_frame, cv2.COLOR_BGR2GRAY)
     _bounding_boxes = fullbody_cascade.detectMultiScale(gray)
     return _bounding_boxes

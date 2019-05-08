@@ -1,7 +1,10 @@
+import sys
+sys.path.append('..')
+
 import cv2
 from blobs.blob import Blob
 
-cap = cv2.VideoCapture('./videos/PeopleWalking.avi')
+cap = cv2.VideoCapture('../videos/PeopleWalking.avi')
 # get first 2 frames
 _, image1 = cap.read()
 _, image2 = cap.read()
