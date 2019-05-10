@@ -54,7 +54,7 @@ python Vehicle_Counting.py "./videos/sample_traffic_scene.mp4"
 Custom configuration:
 
 ```
-python Vehicle_Counting.py "./videos/sample_traffic_scene.mp4" --droi "750,400|1150,400|1850,700|1850,1050|500,1050" --showdroi --detector "haarc" --tracker "csrt --di 5 --mctf 15"
+python Vehicle_Counting.py "./videos/sample_traffic_scene.mp4" --droi "750,400|1150,400|1850,700|1850,1050|500,1050" --showdroi --detector "haarc" --tracker "csrt" --di 5 --mctf 15
 ```
 
 __NB:__ You can press the `s` key when the program is running to capture a screenshot. The images are saved in the [screenshots folder](/screenshots).
