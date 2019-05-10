@@ -1,5 +1,6 @@
 *.pyc
 yolov3.weights
+*.caffemodel
 screenshots/*
 !screenshots/.gitkeep
 videos/*
