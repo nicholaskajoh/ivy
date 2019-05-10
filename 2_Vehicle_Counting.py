@@ -29,7 +29,7 @@ parser.add_argument('--di', type=int, help='detection interval i.e number of fra
 parser.add_argument('--detector', help='select a model/algorithm to use for vehicle detection \
                     (options: yolo, haarc, bgsub, ssd | default: yolo)')
 parser.add_argument('--tracker', help='select a model/algorithm to use for vehicle tracking \
-                    (options: csrt, kcf | default: csrt)')
+                    (options: csrt, kcf, camshift | default: csrt)')
 args = parser.parse_args()
 
 # open log file

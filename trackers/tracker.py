@@ -2,6 +2,7 @@ import sys
 sys.path.append('..')
 
 from trackers.opencv.opencv_trackers import csrt_create, kcf_create
+from trackers.camshift.camshift_tracker import camshift_create
 from blobs.utils import get_centroid, get_area, box_contains_point
 
 
@@ -10,8 +11,10 @@ def create_blob(bounding_box, frame, model):
         return csrt_create(bounding_box, frame)
     if model == 'kcf':
         return kcf_create(bounding_box, frame)
+    if model == 'camshift':
+        return camshift_create(bounding_box, frame)
     else:
-        raise Exception('Invalid tracker model/algorithm specified (options: csrt)')
+        raise Exception('Invalid tracker model/algorithm specified (options: csrt, kcf, camshift)')
 
 def add_new_blobs(boxes, blobs, frame, tracker, current_blob_id):
     # add new blobs to existing blobs
