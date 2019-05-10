@@ -1,13 +1,5 @@
-def get_centroid(_bounding_box):
-    (x, y, w, h) = _bounding_box
-    return (round((x + x + w) / 2), round((y + y + h) / 2))
+from blobs.utils import get_centroid, get_area
 
-def box_contains_point(_bbox, _pt):
-    return _bbox[0] < _pt[0] < _bbox[0] + _bbox[2] and _bbox[1] < _pt[1] < _bbox[1] + _bbox[3]
-
-def get_area(_bbox):
-    _, _, w, h = _bbox
-    return w * h
 
 class Blob:
     def __init__(self, _bounding_box, _tracker):

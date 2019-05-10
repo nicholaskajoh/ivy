@@ -1,6 +1,4 @@
-def get_centroid(_bbox):
-    (x, y, w, h) = _bbox
-    return (round((x + x + w) / 2), round((y + y + h) / 2))
+from blobs.utils import get_centroid
 
 
 class Blob:

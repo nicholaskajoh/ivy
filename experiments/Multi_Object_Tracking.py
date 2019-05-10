@@ -2,7 +2,8 @@ import sys
 sys.path.append('..')
 
 import cv2
-from blobs.blob2 import Blob, get_centroid
+from blobs.blob2 import Blob
+from blobs.utils import get_centroid
 import numpy as np
 from collections import OrderedDict
 
