@@ -12,15 +12,18 @@
 
 ### Configuration
 ```
-usage: Vehicle_Counting.py [-h] [--droi DROI] [--showdroi] [--mctf MCTF]
-                           [--di DI] [--detector DETECTOR] [--tracker TRACKER]
+usage: Vehicle_Counting.py [-h] [--iscam] [--droi DROI] [--showdroi]
+                           [--mctf MCTF] [--di DI] [--detector DETECTOR]
+                           [--tracker TRACKER]
                            video
 
 positional arguments:
-  video                relative/absolute path to video of traffic scene
+  video                relative/absolute path to video or camera input of
+                       traffic scene
 
 optional arguments:
   -h, --help           show this help message and exit
+  --iscam              specify if video capture is from a camera
   --droi DROI          specify a detection region of interest (ROI) i.e a set
                        of vertices that represent the area (polygon) where you
                        want detections to be made (format:
@@ -55,6 +58,12 @@ Custom configuration:
 
 ```
 python Vehicle_Counting.py "./videos/sample_traffic_scene.mp4" --droi "750,400|1150,400|1850,700|1850,1050|500,1050" --showdroi --detector "haarc" --tracker "csrt" --di 5 --mctf 15
+```
+
+With camera input:
+
+```
+python Vehicle_Counting.py 1 --iscam
 ```
 
 __NB:__ You can press the `s` key when the program is running to capture a screenshot. The images are saved in the [screenshots folder](/screenshots).
