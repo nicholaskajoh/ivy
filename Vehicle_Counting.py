@@ -13,7 +13,8 @@ from utils.detection_roi import get_roi_frame, draw_roi
 
 # parse CLI arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('video', help='relative/absolute path to video of traffic scene')
+parser.add_argument('video', help='relative/absolute path to video or camera input of traffic scene')
+parser.add_argument('--iscam', action='store_true', help='specify if video capture is from a camera')
 parser.add_argument('--droi', help='specify a detection region of interest (ROI) \
                     i.e a set of vertices that represent the area (polygon) \
                     where you want detections to be made (format: 1,2|3,4|5,6|7,8|9,10 \
@@ -41,7 +42,8 @@ log_file.write('vehicle_id, count, datetime\n')
 log_file.flush()
 
 # capture traffic scene video from file
-cap = cv2.VideoCapture(args.video)
+video = int(args.video) if args.iscam else args.video
+cap = cv2.VideoCapture(video)
 _, frame = cap.read()
 
 blobs = OrderedDict()
@@ -77,7 +79,7 @@ for box in initial_bboxes:
 
 while True:
     k = cv2.waitKey(1)
-    if cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
+    if args.iscam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
         _, frame = cap.read()
         
         for _id, blob in list(blobs.items()):
