@@ -14,7 +14,7 @@
 ```
 usage: Vehicle_Counting.py [-h] [--iscam] [--droi DROI] [--showdroi]
                            [--mctf MCTF] [--di DI] [--detector DETECTOR]
-                           [--tracker TRACKER]
+                           [--tracker TRACKER] [--record]
                            video
 
 positional arguments:
@@ -41,6 +41,7 @@ optional arguments:
                        (options: yolo, haarc, bgsub, ssd | default: yolo)
   --tracker TRACKER    select a model/algorithm to use for vehicle tracking
                        (options: csrt, kcf, camshift | default: kcf)
+  --record             record video and vehicle count logs
 ```
 
 ### Notes

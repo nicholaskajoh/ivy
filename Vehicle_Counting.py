@@ -31,21 +31,16 @@ parser.add_argument('--detector', help='select a model/algorithm to use for vehi
                     (options: yolo, haarc, bgsub, ssd | default: yolo)')
 parser.add_argument('--tracker', help='select a model/algorithm to use for vehicle tracking \
                     (options: csrt, kcf, camshift | default: kcf)')
+parser.add_argument('--record', action='store_true', help='record video and vehicle count logs')
 args = parser.parse_args()
 
-# open log file
-log_file_name = 'log.txt'
-with contextlib.suppress(FileNotFoundError):
-    os.remove(log_file_name)
-log_file = open(log_file_name, 'a')
-log_file.write('vehicle_id, count, datetime\n')
-log_file.flush()
 
-# capture traffic scene video from file
+# capture traffic scene video
 video = int(args.video) if args.iscam else args.video
 cap = cv2.VideoCapture(video)
 _, frame = cap.read()
 
+# configs
 blobs = OrderedDict()
 blob_id = 1
 frame_counter = 0
@@ -54,6 +49,17 @@ MAX_CONSECUTIVE_TRACKING_FAILURES = 10 if args.mctf == None else args.mctf
 detector = 'yolo' if args.detector == None else args.detector
 tracker = 'kcf' if args.tracker == None else args.tracker
 f_height, f_width, _ = frame.shape
+
+# init video object and log file to record counting
+if args.record:
+    output_video = cv2.VideoWriter('./videos/output.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (f_width, f_height))
+
+    log_file_name = 'log.txt'
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(log_file_name)
+    log_file = open(log_file_name, 'a')
+    log_file.write('vehicle_id, count, datetime\n')
+    log_file.flush()
 
 # set counting line
 cl_y = round(4 / 5 * f_height)
@@ -105,9 +111,10 @@ while True:
                 vehicle_count += 1
 
                 # log count data to a file (vehicle_id, count, datetime)
-                _row = '{0}, {1}, {2}\n'.format('v_' + str(_id), vehicle_count, datetime.now())
-                log_file.write(_row)
-                log_file.flush()
+                if args.record:
+                    _row = '{0}, {1}, {2}\n'.format('v_' + str(_id), vehicle_count, datetime.now())
+                    log_file.write(_row)
+                    log_file.flush()
 
         if frame_counter >= DETECTION_INTERVAL:
             # rerun detection
@@ -127,6 +134,10 @@ while True:
         # show detection roi
         if args.showdroi:
             frame = draw_roi(frame, droi)
+
+        # save frame in video output
+        if args.record:
+            output_video.write(frame)
 
         # visualize vehicle counting
         resized_frame = cv2.resize(frame, (858, 480))
@@ -148,7 +159,9 @@ while True:
         print('Video exited.')
         break
 
-# end capture, close window
+# end capture, close window, close log file and video objects if any
 cap.release()
 cv2.destroyAllWindows()
-log_file.close()
+if args.record:
+    log_file.close()
+    output_video.release()
