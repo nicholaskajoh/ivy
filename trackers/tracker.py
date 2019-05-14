@@ -23,8 +23,9 @@ def add_new_blobs(boxes, blobs, frame, tracker, current_blob_id):
         box_area = get_area(box)
         match_found = False
         for _id, blob in blobs.items():
-            if (blob.area >= box_area and box_contains_point(blob.bounding_box, box_centroid)) \
-                    or (box_area >= blob.area and box_contains_point(box, blob.centroid)):
+            if blob.counted == False and \
+                    ((blob.area >= box_area and box_contains_point(blob.bounding_box, box_centroid)) \
+                    or (box_area >= blob.area and box_contains_point(box, blob.centroid))):
                 match_found = True
                 temp_blob = create_blob(box, frame, tracker) # TODO: update blob w/o creating temp blob
                 blob.update(temp_blob.bounding_box, temp_blob.tracker)
