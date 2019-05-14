@@ -45,7 +45,7 @@ blobs = OrderedDict()
 blob_id = 1
 frame_counter = 0
 DETECTION_INTERVAL = 10 if args.di == None else args.di
-MAX_CONSECUTIVE_TRACKING_FAILURES = 10 if args.mctf == None else args.mctf
+MAX_CONSECUTIVE_TRACKING_FAILURES = 3 if args.mctf == None else args.mctf
 detector = 'yolo' if args.detector == None else args.detector
 tracker = 'kcf' if args.tracker == None else args.tracker
 f_height, f_width, _ = frame.shape
