@@ -13,5 +13,6 @@ class Blob:
     def update(self, _bounding_box, _tracker=None):
         self.bounding_box = _bounding_box
         self.centroid = get_centroid(_bounding_box)
+        self.area = get_area(_bounding_box)
         if _tracker:
             self.tracker = _tracker
