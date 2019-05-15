@@ -4,6 +4,7 @@ sys.path.append('..')
 from trackers.opencv.opencv_trackers import csrt_create, kcf_create
 from trackers.camshift.camshift_tracker import camshift_create
 from blobs.utils import get_centroid, get_area, box_contains_point
+from counter import is_passed_counting_line
 
 
 def create_blob(bounding_box, frame, model):
@@ -16,7 +17,7 @@ def create_blob(bounding_box, frame, model):
     else:
         raise Exception('Invalid tracker model/algorithm specified (options: csrt, kcf, camshift)')
 
-def add_new_blobs(boxes, blobs, frame, tracker, current_blob_id):
+def add_new_blobs(boxes, blobs, frame, tracker, current_blob_id, counting_line, line_position):
     # add new blobs to existing blobs
     for box in boxes:
         box_centroid = get_centroid(box)
@@ -31,7 +32,7 @@ def add_new_blobs(boxes, blobs, frame, tracker, current_blob_id):
                 blob.update(temp_blob.bounding_box, temp_blob.tracker)
                 break
 
-        if not match_found:
+        if not match_found and not is_passed_counting_line(box_centroid, counting_line, line_position):
             _blob = create_blob(box, frame, tracker)
             blobs[current_blob_id] = _blob
             current_blob_id += 1

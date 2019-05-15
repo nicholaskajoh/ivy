@@ -9,6 +9,7 @@ import contextlib
 from datetime import datetime
 import argparse
 from utils.detection_roi import get_roi_frame, draw_roi
+from counter import get_counting_line, is_passed_counting_line
 
 
 # parse CLI arguments
@@ -32,6 +33,8 @@ parser.add_argument('--detector', help='select a model/algorithm to use for vehi
 parser.add_argument('--tracker', help='select a model/algorithm to use for vehicle tracking \
                     (options: csrt, kcf, camshift | default: kcf)')
 parser.add_argument('--record', action='store_true', help='record video and vehicle count logs')
+parser.add_argument('--clposition', help='position of counting line (options: top, bottom, \
+                    left, right | default: bottom)')
 args = parser.parse_args()
 
 
@@ -62,8 +65,8 @@ if args.record:
     log_file.flush()
 
 # set counting line
-cl_y = round(4 / 5 * f_height)
-counting_line = [(0, cl_y), (f_width, cl_y)]
+clposition = 'bottom' if args.clposition == None else args.clposition
+counting_line = get_counting_line(clposition, f_width, f_height)
 vehicle_count = 0
 
 # create detection ROI
@@ -94,19 +97,15 @@ while True:
             if success:
                 blob.num_consecutive_tracking_failures = 0
                 blob.update(box)
-
-                # draw and label bounding boxes
-                (x, y, w, h) = [int(v) for v in box]
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                cv2.putText(frame, 'v_' + str(_id), (x, y - 2), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             else:
                 blob.num_consecutive_tracking_failures += 1
 
+            # delete untracked blobs
             if blob.num_consecutive_tracking_failures >= MAX_CONSECUTIVE_TRACKING_FAILURES:
                 del blobs[_id]
 
             # count vehicles
-            if blob.centroid[1] >= cl_y and not blob.counted:
+            if is_passed_counting_line(blob.centroid, counting_line, clposition) and not blob.counted:
                 blob.counted = True
                 vehicle_count += 1
 
@@ -120,10 +119,16 @@ while True:
             # rerun detection
             droi_frame = get_roi_frame(frame, droi)
             boxes = get_bounding_boxes(droi_frame, detector)
-            blobs, current_blob_id = add_new_blobs(boxes, blobs, frame, tracker, blob_id)
+            blobs, current_blob_id = add_new_blobs(boxes, blobs, frame, tracker, blob_id, counting_line, clposition)
             blob_id = current_blob_id
             blobs = remove_duplicates(blobs)
             frame_counter = 0
+
+        # draw and label blob bounding boxes
+        for _id, blob in blobs.items():
+            (x, y, w, h) = [int(v) for v in blob.bounding_box]
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.putText(frame, 'v_' + str(_id), (x, y - 2), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
         # draw counting line
         cv2.line(frame, counting_line[0], counting_line[1], (0, 255, 0), 3)
