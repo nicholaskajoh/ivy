@@ -44,8 +44,8 @@ def remove_duplicates(blobs):
             if blob_a == blob_b:
                 break
 
-            if blob_a.area >= blob_b.area and box_contains_point(blob_a.bounding_box, blob_b.centroid):
+            if blob_a.area >= blob_b.area and box_contains_point(blob_a.bounding_box, blob_b.centroid) and id_b in blobs:
                 del blobs[id_b]
-            elif blob_b.area >= blob_a.area and box_contains_point(blob_b.bounding_box, blob_a.centroid):
+            elif blob_b.area >= blob_a.area and box_contains_point(blob_b.bounding_box, blob_a.centroid) and id_a in blobs:
                 del blobs[id_a]
     return blobs
