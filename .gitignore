@@ -6,3 +6,11 @@ screenshots/*
 videos/*
 !videos/.gitkeep
 log.txt
+.idea/
+*.tar.gz
+detectors/ssd/test.prototxt
+detectors/ssd/train.prototxt
+detectors/ssd/solver.prototxt
+detectors/ssd/ssd_pascal.py
+detectors/ssd/score_ssd_pascal.py
+detectors/ssd/deploy.prototxt
