@@ -14,3 +14,4 @@ detectors/ssd/solver.prototxt
 detectors/ssd/ssd_pascal.py
 detectors/ssd/score_ssd_pascal.py
 detectors/ssd/deploy.prototxt
+.vscode/
