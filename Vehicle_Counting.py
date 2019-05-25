@@ -248,7 +248,7 @@ if __name__ == '__main__':
 
             # save frame if 's' key is pressed
             if k & 0xFF == ord('s'):
-                cv2.imwrite(os.path.join('screenshots', 'ss_' + uuid.uuid4().hex + '.png'), cv_frame)
+                cv2.imwrite(os.path.join('screenshots', 'ss_' + uuid.uuid4().hex + '.png'), vc_frame)
                 print('Screenshot taken.')
         else:
             print('End of video.')
