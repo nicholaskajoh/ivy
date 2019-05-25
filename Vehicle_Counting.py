@@ -243,7 +243,7 @@ if __name__ == '__main__':
             _, frame = cap.read()            
             
             # visualize vehicle counting
-            vc_frame = frame = vehicle_counter.count_vehicles(frame)
+            vc_frame = vehicle_counter.count_vehicles(frame)
             cv2.imshow('tracking', vc_frame)
 
             # save frame if 's' key is pressed
