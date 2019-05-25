@@ -55,6 +55,7 @@ class VehicleCounting():
         self.is_initialized = False
     
     def initialize_recording(self):
+        if self.record:
         self.output_video = cv2.VideoWriter(self.record_destination, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (self.frame_width, self.frame_height))
         log_file_name = 'log.txt'
         with contextlib.suppress(FileNotFoundError):
