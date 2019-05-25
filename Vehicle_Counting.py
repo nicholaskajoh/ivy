@@ -54,6 +54,9 @@ class VehicleCounter():
         self.is_initialized = False
     
     def initialize_recording(self):
+        """
+        Initialises recording for a given cv frame
+        """
         if self.record:
             self.output_video = cv2.VideoWriter(self.record_destination, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (self.frame_width, self.frame_height))
             log_file_name = 'log.txt'
@@ -64,6 +67,9 @@ class VehicleCounter():
             self.log_file.flush()
 
     def initialize_blobs(self):
+        """
+        Given a cv frame, update blobs in relation initial blob boxes
+        """
         droi_frame = get_roi_frame(self.frame, self.droi)
         initial_bboxes = get_bounding_boxes(droi_frame, self.detector)
         for box in initial_bboxes:
@@ -72,12 +78,26 @@ class VehicleCounter():
             self.blob_id += 1
 
     def set_detector(self,detector):
+        """
+        Sets the detector model/algorithm to be used for vehicle counting
+        options: yolo, haarc, bgsub, ssd
+        """
         self.detector = detector
 
     def set_tracker(self, tracker):
+        """
+        Sets the tracker model/algorithm to be used for tracking vehicles
+        options: csrt, kcf, camshift | default: kcf
+        """
         self.tracker = tracker
 
     def set_droi(self, droi):
+        """
+        Set a detection region of interest (DROI) 
+        i.e a set of vertices that represent the area (polygon) where
+        you want detections to be made
+        example: 1,2|3,4|5,6|7,8|9,10
+        """
         if(droi):
             self.droi = []
             points = droi.replace(' ', '').split('|')
@@ -86,24 +106,51 @@ class VehicleCounter():
                 self.droi.append(point)
 
     def set_show_droi(self, show_droi):
+        """
+        Set whether a display/overlay representing the DROI should be displayed
+        """
         self.show_droi = show_droi
 
     def set_mctf(self, mctf):
+        """
+        Set the number of maximum consecutive tracking failures 
+        before the tracker concludes that a tracked object has left the frame
+        """
         self.mctf = mctf
     
     def set_detection_interval(self, di):
+        """
+        Set the number of frames before detection is carried out again 
+        in order to find new vehicles and update the trackers of old ones
+        """
         self.detection_interval = di
 
     def set_record(self, flag):
+        """
+        Set whether a video record and count logs should be saved to file
+        """
         self.record = flag
 
     def set_record_destination(self,path_to_file):
+        """
+        Set the destination folder for recorded videos and count logs
+        """
         self.record_destination = path_to_file
 
     def set_cl_position(self, cl_position):
+        """
+        Set the position for the vehicle counting line 
+        """
         self.cl_position = cl_position
 
     def count_vehicles(self, frame):
+        """
+        Overlays a frame with a DROI (where necessary) and add boxes with labels
+        over detected vehicles in the frame then use trackers to determine 
+        vehicles that have crossed the counting line. 
+        Subsequently a video record and vehicle count log files are updated if required
+        """
+
         self.frame = frame
         if not self.is_initialized:
             self.initialize()
@@ -171,6 +218,9 @@ class VehicleCounter():
         return resized_frame
 
     def __del__(self):
+        """
+        Clean up release resources when this class is no longer needed
+        """
         if self.log_file:
             self.log_file.close()
 
@@ -234,6 +284,7 @@ if __name__ == '__main__':
     if args.showdroi:
         vehicle_counter.set_show_droi(True)
 
+    # loop through cv frame and count vvehicles
     while True:
         k = cv2.waitKey(1)
         if args.iscam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
