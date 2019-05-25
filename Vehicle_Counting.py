@@ -1,6 +1,3 @@
-
-#import sys
-#print(sys.path)
 import cv2
 from trackers.tracker import create_blob, add_new_blobs, remove_duplicates
 import numpy as np
@@ -14,9 +11,9 @@ import argparse
 from utils.detection_roi import get_roi_frame, draw_roi
 from counter import get_counting_line, is_passed_counting_line
 
-class VehicleCounting():
+class VehicleCounter():
 
-    def __init__(self, detector='yolo', tracker='kcf', droi=None, show_droi = False, mctf=3, di=10, record=False, record_path='./videos/output.avi', log_file='log.txt', cl_position='bottom'):
+    def __init__(self, detector='yolo', tracker='kcf', droi=[], show_droi = False, mctf=3, di=10, record=False, record_path='./videos/output.avi', log_file='log.txt', cl_position='bottom'):
         self.detector = detector
         self.tracker = tracker
         self.droi =  droi
@@ -34,14 +31,16 @@ class VehicleCounting():
     def initialize(self):
         if(not self.droi):
             self.frame_height, self.frame_width, _ = self.frame.shape
-            self.droi = [(0, 0), (self.frame_width, 0), (self.frame_width, self.frame_height), (0, self.frame_height)]
+            self.droi = [(0, 0), (self.frame_width, 0), 
+                (self.frame_width, self.frame_height), 
+                    (0, self.frame_height)]
         else:
-            tpm_droi = []
+            tmp_droi = []
             points = self.droi.replace(' ', '').split('|')
             for point_str in points:
                 point = tuple(map(int, point_str.split(',')))
                 tmp_droi.append(point)
-            self.droi = tmp.droi
+            self.droi = tmp_droi
 
         self.blobs = OrderedDict()
         self.blob_id = 1
@@ -49,20 +48,20 @@ class VehicleCounting():
         self.vehicle_count = 0
         self.counting_line = get_counting_line(self.cl_position, self.frame_width, self.frame_height)
 
-    def reset():
+    def reset(self):
         self.frame = None
         self.droi = None
         self.is_initialized = False
     
     def initialize_recording(self):
         if self.record:
-        self.output_video = cv2.VideoWriter(self.record_destination, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (self.frame_width, self.frame_height))
-        log_file_name = 'log.txt'
-        with contextlib.suppress(FileNotFoundError):
-            os.remove(log_file_name)
-        self.log_file = open(log_file_name, 'a')
-        self.log_file.write('vehicle_id, count, datetime\n')
-        self.log_file.flush()
+            self.output_video = cv2.VideoWriter(self.record_destination, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (self.frame_width, self.frame_height))
+            log_file_name = 'log.txt'
+            with contextlib.suppress(FileNotFoundError):
+                os.remove(log_file_name)
+            self.log_file = open(log_file_name, 'a')
+            self.log_file.write('vehicle_id, count, datetime\n')
+            self.log_file.flush()
 
     def initialize_blobs(self):
         droi_frame = get_roi_frame(self.frame, self.droi)
@@ -86,8 +85,8 @@ class VehicleCounting():
                 point = tuple(map(int, point_str.split(',')))
                 self.droi.append(point)
 
-    def set_show_droi(self, flag):
-        self.show_droi = flag
+    def set_show_droi(self, show_droi):
+        self.show_droi = show_droi
 
     def set_mctf(self, mctf):
         self.mctf = mctf
@@ -106,7 +105,7 @@ class VehicleCounting():
 
     def count_vehicles(self, frame):
         self.frame = frame
-        if(not self.is_initialized):
+        if not self.is_initialized:
             self.initialize()
             self.is_initialized = True
 
@@ -134,8 +133,8 @@ class VehicleCounting():
                 # log count data to a file (vehicle_id, count, datetime)
                 if self.record:
                     _row = '{0}, {1}, {2}\n'.format('v_' + str(_id), self.vehicle_count, datetime.now())
-                    log_file.write(_row)
-                    log_file.flush()
+                    self.log_file.write(_row)
+                    self.log_file.flush()
 
         if self.frame_counter >= self.detection_interval:
             # rerun detection
@@ -172,15 +171,13 @@ class VehicleCounting():
         return resized_frame
 
     def __del__(self):
-        if(self.log_file):
+        if self.log_file:
             self.log_file.close()
 
-        if(self.output_video):
+        if self.output_video:
             self.output_video.release()
 
 if __name__ == '__main__':
-    pass
-
     # parse CLI arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('video', help='relative/absolute path to video or camera input of traffic scene')
@@ -209,33 +206,33 @@ if __name__ == '__main__':
     # capture traffic scene video
     video = int(args.video) if args.iscam else args.video
     cap = cv2.VideoCapture(video)
-    vehicle_counter = VehicleCounting()
+    vehicle_counter = VehicleCounter()
 
-    if(args.di):
-        counter.set_detection_interval(args.di)
+    if args.di:
+        vehicle_counter.set_detection_interval(args.di)
 
-    if(args.mctf):
-        counter.set_mctf(args.mctf)
+    if args.mctf:
+        vehicle_counter.set_mctf(args.mctf)
 
-    if(args.detector):
-        counter.set_detector(detector)
+    if args.detector:
+        vehicle_counter.set_detector(args.detector)
 
-    if(args.tracker):
-        counter.set_tracker(args.tracker)
+    if args.tracker:
+        vehicle_counter.set_tracker(args.tracker)
 
     # init video object and log file to record counting
     if args.record:
-        counter.set_record(True)
+        vehicle_counter.set_record(True)
 
     if args.clposition:
-        counter.set_cl_position(args.clposition)
+        vehicle_counter.set_cl_position(args.clposition)
 
     # create detection ROI
     if args.droi:
-        counter.set_droi(args.droi)
+        vehicle_counter.set_droi(args.droi)
     
     if args.showdroi:
-        counter.set_show_droi(True)
+        vehicle_counter.set_show_droi(True)
 
     while True:
         k = cv2.waitKey(1)

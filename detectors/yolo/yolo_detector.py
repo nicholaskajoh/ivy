@@ -3,21 +3,6 @@ import numpy as np
 import os
 from configparser import ConfigParser
 
-class VehicleCountingConfigNotFound(Exception):
-    pass
-
-class YoloConfigSectionNotFoundError(Exception):
-    pass
-
-class WeightsConfigOptionNotFoundError(Exception):
-    pass
-
-class WeightsConfigOptionFileNotFoundError(Exception):
-    pass
-
-class WeightsAndConfigNotFoundError(Exception):
-    pass
-
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 VC_CONFIG_YOLO_SECTION = 'yolo'
 VC_CONFIG_YOLO_WEIGHTS_OPTION = 'weights'
@@ -60,16 +45,16 @@ def get_bounding_boxes(image):
                         weight_found = True
                     else:
                         error_message += 'The file specified in the yolo weight option of the Vehicle-Counting config does not exist\n'
-                        raise WeightsConfigOptionFileNotFoundError(error_message)
+                        raise Exception(error_message)
                 else:
                     error_message += 'A weights option was not found in yolo section of the Vehicle-Counting config file\n'  
-                    raise YoloConfigSectionNotFoundError(error_message)
+                    raise Exception(error_message)
             else:
                 error_message += 'A yolo section was not found in the Vehicle-Counting config file\n'
-                raise YoloConfigSectionNotFoundError(error_message)
+                raise Exception(error_message)
         else: # config file 
             error_message+='Vehicle Counting config file not found\n'
-            raise VehicleCountingConfigNotFound(error_message)
+            raise Exception(error_message)
 
     # make sure yolo confi file exists
     if(not is_cfg_exists):
