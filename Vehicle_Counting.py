@@ -212,10 +212,11 @@ class VehicleCounter():
         if self.record:
             self.output_video.write(self.frame)
 
-        # visualize vehicle counting
-        resized_frame = cv2.resize(self.frame, (858, 480))
+        # increase frame count
         self.frame_counter += 1
-        return resized_frame
+
+        #return processed frame
+        return self.frame
 
     def __del__(self):
         """
@@ -292,7 +293,8 @@ if __name__ == '__main__':
             
             # visualize vehicle counting
             vc_frame = vehicle_counter.count_vehicles(frame)
-            cv2.imshow('tracking', vc_frame)
+            resized_frame = cv2.resize(vc_frame, (858, 480))
+            cv2.imshow('tracking', resized_frame)
 
             # save frame if 's' key is pressed
             if k & 0xFF == ord('s'):
