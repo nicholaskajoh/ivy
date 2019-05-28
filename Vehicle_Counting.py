@@ -156,8 +156,8 @@ class VehicleCounter():
             self.initialize()
             self.is_initialized = True
 
-        self.initialize_recording
-        self.initialize_blobs
+        self.initialize_recording()
+        self.initialize_blobs()
                 
         for _id, blob in list(self.blobs.items()):
             # update trackers
