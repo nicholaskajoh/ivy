@@ -289,10 +289,10 @@ if __name__ == '__main__':
     while True:
         k = cv2.waitKey(1)
         if args.iscam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
-            _, frame = cap.read()            
+            _, cv_frame = cap.read()            
             
             # visualize vehicle counting
-            vc_frame = vehicle_counter.count_vehicles(frame)
+            vc_frame = vehicle_counter.count_vehicles(cv_frame)
             resized_frame = cv2.resize(vc_frame, (858, 480))
             cv2.imshow('tracking', resized_frame)
 
