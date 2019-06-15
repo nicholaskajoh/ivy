@@ -33,6 +33,7 @@ parser.add_argument('--detector', help='select a model/algorithm to use for vehi
 parser.add_argument('--tracker', help='select a model/algorithm to use for vehicle tracking \
                     (options: csrt, kcf, camshift | default: kcf)')
 parser.add_argument('--record', action='store_true', help='record video and vehicle count logs')
+parser.add_argument('--output', help='path to output video')
 parser.add_argument('--clposition', help='position of counting line (options: top, bottom, \
                     left, right | default: bottom)')
 args = parser.parse_args()
@@ -55,7 +56,7 @@ f_height, f_width, _ = frame.shape
 
 # init video object and log file to record counting
 if args.record:
-    output_video = cv2.VideoWriter('./videos/output.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (f_width, f_height))
+    output_video = cv2.VideoWriter('./output.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (f_width, f_height))
 
     log_file_name = 'log.txt'
     with contextlib.suppress(FileNotFoundError):
@@ -145,8 +146,8 @@ while True:
             output_video.write(frame)
 
         # visualize vehicle counting
-        resized_frame = cv2.resize(frame, (858, 480))
-        cv2.imshow('tracking', resized_frame)
+        # resized_frame = cv2.resize(frame, (858, 480))
+        # cv2.imshow('tracking', resized_frame)
 
         frame_counter += 1
 
