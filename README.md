@@ -13,9 +13,9 @@
 ### Configuration
 ```
 usage: Vehicle_Counting.py [-h] [--iscam] [--droi DROI] [--showdroi]
-                           [--mctf MCTF] [--di DI] [--detector DETECTOR]
-                           [--tracker TRACKER] [--record] [--headless]
-                           [--clposition CLPOSITION]
+                           [--mcdf MCDF] [--mctf MCTF] [--di DI]
+                           [--detector DETECTOR] [--tracker TRACKER]
+                           [--record] [--headless] [--clposition CLPOSITION]
                            video
 
 positional arguments:
@@ -32,6 +32,9 @@ optional arguments:
                         width,frame_height|0,frame_height [i.e the whole video
                         frame])
   --showdroi            display/overlay the detection roi on the video
+  --mcdf MCDF           maximum consecutive detection failures i.e number of
+                        detection failures before it's concluded that an
+                        object is no longer in the frame
   --mctf MCTF           maximum consecutive tracking failures i.e number of
                         tracking failures before the tracker concludes the
                         tracked object has left the frame

@@ -15,12 +15,13 @@ from counter import get_counting_line, is_passed_counting_line
 
 class VehicleCounter():
 
-    def __init__(self, initial_frame, detector, tracker, droi, show_droi, mctf, di, cl_position):
+    def __init__(self, initial_frame, detector, tracker, droi, show_droi, mcdf, mctf, di, cl_position):
         self.frame = initial_frame # current frame of video
         self.detector = detector
         self.tracker = tracker
         self.droi =  droi # detection region of interest
         self.show_droi = show_droi
+        self.mcdf = mcdf # maximum consecutive detection failures
         self.mctf = mctf # maximum consecutive tracking failures
         self.di = di # detection interval
         self.cl_position = cl_position # counting line position
@@ -54,7 +55,7 @@ class VehicleCounter():
             # rerun detection
             droi_frame = get_roi_frame(self.frame, self.droi)
             boxes = get_bounding_boxes(droi_frame, self.detector)
-            self.blobs, current_blob_id = add_new_blobs(boxes, self.blobs, self.frame, self.tracker, self.blob_id, self.counting_line, self.cl_position)
+            self.blobs, current_blob_id = add_new_blobs(boxes, self.blobs, self.frame, self.tracker, self.blob_id, self.counting_line, self.cl_position, self.mcdf)
             self.blob_id = current_blob_id
             self.blobs = remove_duplicates(self.blobs)
             self.frame_count = 0
@@ -113,6 +114,9 @@ if __name__ == '__main__':
                         default: 0,0|frame_width,0|frame_width,frame_height|0,frame_height \
                         [i.e the whole video frame])')
     parser.add_argument('--showdroi', action='store_true', help='display/overlay the detection roi on the video')
+    parser.add_argument('--mcdf', type=int, help='maximum consecutive detection failures \
+                        i.e number of detection failures before it\'s concluded that \
+                        an object is no longer in the frame')
     parser.add_argument('--mctf', type=int, help='maximum consecutive tracking failures \
                         i.e number of tracking failures before the tracker concludes \
                         the tracked object has left the frame')
@@ -138,6 +142,7 @@ if __name__ == '__main__':
     f_height, f_width, _ = frame.shape
 
     di = 10 if args.di == None else args.di
+    mcdf = 2 if args.mcdf == None else args.mcdf
     mctf = 3 if args.mctf == None else args.mctf
     detector = 'yolo' if args.detector == None else args.detector
     tracker = 'kcf' if args.tracker == None else args.tracker
@@ -153,7 +158,7 @@ if __name__ == '__main__':
         droi = tmp_droi
     clposition = 'bottom' if args.clposition == None else args.clposition
 
-    vehicle_counter = VehicleCounter(frame, detector, tracker, droi, args.showdroi, mctf, di, clposition)
+    vehicle_counter = VehicleCounter(frame, detector, tracker, droi, args.showdroi, mcdf, mctf, di, clposition)
 
     if args.record:
         # initialize video object and log file to record counting
