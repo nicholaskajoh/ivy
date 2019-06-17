@@ -13,9 +13,7 @@ def get_bounding_boxes(image):
     classes_of_interest = ['bicycle', 'car', 'motorcycle', 'bus', 'truck']
     
     # create a YOLO v3 DNN model using pre-trained weights
-    net = cv2.dnn.readNet(
-        os.path.join(__location__, 'yolov3.weights'), os.path.join(__location__, 'yolov3.cfg')
-    )
+    net = cv2.dnn.readNet(os.path.join(__location__, 'yolov3.weights'), os.path.join(__location__, 'yolov3.cfg'))
     
     # create image blob
     scale = 0.00392

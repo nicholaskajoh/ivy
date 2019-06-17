@@ -14,7 +14,7 @@
 ```
 usage: Vehicle_Counting.py [-h] [--iscam] [--droi DROI] [--showdroi]
                            [--mctf MCTF] [--di DI] [--detector DETECTOR]
-                           [--tracker TRACKER] [--record]
+                           [--tracker TRACKER] [--record] [--headless]
                            [--clposition CLPOSITION]
                            video
 
@@ -43,6 +43,7 @@ optional arguments:
   --tracker TRACKER     select a model/algorithm to use for vehicle tracking
                         (options: csrt, kcf, camshift | default: kcf)
   --record              record video and vehicle count logs
+  --headless            run VCS without UI display
   --clposition CLPOSITION
                         position of counting line (options: top, bottom, left,
                         right | default: bottom)
