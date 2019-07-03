@@ -51,15 +51,6 @@ class VehicleCounter():
         log = []
         self.frame = frame
 
-        if self.frame_count >= self.di:
-            # rerun detection
-            droi_frame = get_roi_frame(self.frame, self.droi)
-            boxes = get_bounding_boxes(droi_frame, self.detector)
-            self.blobs, current_blob_id = add_new_blobs(boxes, self.blobs, self.frame, self.tracker, self.blob_id, self.counting_line, self.cl_position, self.mcdf)
-            self.blob_id = current_blob_id
-            self.blobs = remove_duplicates(self.blobs)
-            self.frame_count = 0
-
         for _id, blob in list(self.blobs.items()):
             # update trackers
             success, box = blob.tracker.update(self.frame)
@@ -69,21 +60,31 @@ class VehicleCounter():
             else:
                 blob.num_consecutive_tracking_failures += 1
 
-            if blob.num_consecutive_tracking_failures >= self.mctf:
-                # count vehicles that have left the frame if no counting line exists
-                if self.counting_line == None:
-                    blob.counted = True
-                    self.vehicle_count += 1
-                    log.append({'blob_id': _id, 'count': self.vehicle_count, 'datetime': datetime.now()})
-                
-                # delete untracked blobs
-                del self.blobs[_id]
-
-            # count vehicles that have passed the counting line if one exists
-            if self.counting_line != None and is_passed_counting_line(blob.centroid, self.counting_line, self.cl_position) and not blob.counted:
+            # count vehicles that have left the frame if no counting line exists
+            # or those that have passed the counting line if one exists
+            if (self.counting_line == None and \
+                    (blob.num_consecutive_tracking_failures == self.mctf or blob.num_consecutive_detection_failures == mcdf) and \
+                    not blob.counted) \
+                        or \
+                    (self.counting_line != None and \
+                    is_passed_counting_line(blob.centroid, self.counting_line, self.cl_position) and \
+                    not blob.counted):
                 blob.counted = True
                 self.vehicle_count += 1
                 log.append({'blob_id': _id, 'count': self.vehicle_count, 'datetime': datetime.now()})
+
+            if blob.num_consecutive_tracking_failures >= self.mctf:    
+                # delete untracked blobs
+                del self.blobs[_id]
+
+        if self.frame_count >= self.di:
+            # rerun detection
+            droi_frame = get_roi_frame(self.frame, self.droi)
+            boxes = get_bounding_boxes(droi_frame, self.detector)
+            self.blobs, current_blob_id = add_new_blobs(boxes, self.blobs, self.frame, self.tracker, self.blob_id, self.counting_line, self.cl_position, self.mcdf)
+            self.blob_id = current_blob_id
+            self.blobs = remove_duplicates(self.blobs)
+            self.frame_count = 0
 
         self.frame_count += 1
 
