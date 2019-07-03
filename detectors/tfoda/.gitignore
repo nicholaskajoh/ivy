@@ -1,0 +1,6 @@
+*.pb
+*.pbtxt
+*.classes.txt
+.env
+downloads/*
+!downloads/.gitkeep

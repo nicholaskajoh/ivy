@@ -131,7 +131,7 @@ if __name__ == '__main__':
                         before detection is carried out again (in order to find new vehicles \
                         and update the trackers of old ones)')
     parser.add_argument('--detector', help='select a model/algorithm to use for vehicle detection \
-                        (options: yolo, haarc, bgsub, ssd | default: yolo)')
+                        (options: yolo, haarc, bgsub, ssd, tfoda | default: yolo)')
     parser.add_argument('--tracker', help='select a model/algorithm to use for vehicle tracking \
                         (options: csrt, kcf, camshift | default: kcf)')
     parser.add_argument('--record', action='store_true', help='record video and vehicle count logs')
