@@ -82,5 +82,7 @@ __NB:__ You can press the `s` key when the program is running to capture a scree
 ## How it works
 The vehicle counting system is made up of three main components: a detector, tracker and counter. The detector identifies vehicles in a given frame of video and returns a list of bounding boxes around the vehicles to the tracker. The tracker uses the bounding boxes to track the vehicles in subsequent frames. The detector is also used to update trackers periodically to ensure that they are still tracking the vehicles correctly. The counter draws a counting lines across the road. When a vehicle crosses the line, the vehicle count is incremented.
 
+__PS:__ You can find out about how the vehicle counting system was built by checking out this article on my blog: https://alphacoder.xyz/vehicle-counting/.
+
 ## Donate
 Love this project? You can [buy me a coffee or two](http://buymeacoff.ee/nicholaskajoh) to support its continued development. 😊
