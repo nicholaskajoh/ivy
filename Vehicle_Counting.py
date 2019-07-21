@@ -202,7 +202,7 @@ if __name__ == '__main__':
         k = cv2.waitKey(1) & 0xFF
         # save frame if 's' key is pressed
         if k & 0xFF == ord('s'):
-            cv2.imwrite(os.path.join('screenshots', 'ss_' + uuid.uuid4().hex + '.png'), vc_frame)
+            cv2.imwrite(os.path.join('screenshots', 'ss_' + uuid.uuid4().hex + '.png'), output_frame)
             print('Screenshot taken.')
         # end video loop if 'q' key is pressed
         if k & 0xFF == ord('q'):
