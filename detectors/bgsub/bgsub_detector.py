@@ -35,4 +35,4 @@ def get_bounding_boxes(image):
                 diagonal_size > 100.0:
             bboxes.append(bbox)
 
-    return bboxes
+    return bboxes, None, None

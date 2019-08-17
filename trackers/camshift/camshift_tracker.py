@@ -33,10 +33,10 @@ class Camshift():
         return success, bounding_box
 
 
-def camshift_create(bounding_box, frame):
+def camshift_create(bounding_box, vehicle_type, type_confidence, frame):
     x, y, w, h = [int(v) for v in bounding_box]
     roi = frame[y:y + h, x:x + w]
     hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
     roi_hist = cv2.calcHist([hsv_roi], [0], None, [180], [0, 180])
     tracker = Camshift(bounding_box, roi_hist)
-    return Blob((x, y, w, h), roi_hist, tracker)
+    return Blob((x, y, w, h), vehicle_type, type_confidence, roi_hist, tracker)

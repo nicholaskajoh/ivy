@@ -53,4 +53,4 @@ def get_bounding_boxes(image):
             x, y, w, h = x_bottom_left, y_bottom_left, x_top_right - x_bottom_left, y_top_right - y_bottom_left
             bounding_boxes.append([x, y, w, h])
 
-    return bounding_boxes
+    return bounding_boxes, None, None

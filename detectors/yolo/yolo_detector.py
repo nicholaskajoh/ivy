@@ -29,8 +29,8 @@ def get_bounding_boxes(image):
     output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
     outputs = net.forward(output_layers)
 
-    class_ids = []
-    confidences = []
+    _classes = []
+    _confidences = []
     boxes = []
     conf_threshold = float(os.getenv('CONFIDENCE_THRESHOLD'))
     nms_threshold = 0.4
@@ -49,16 +49,16 @@ def get_bounding_boxes(image):
                 h = int(detection[3] * height)
                 x = center_x - w / 2
                 y = center_y - h / 2
-                class_ids.append(class_id)
-                confidences.append(float(confidence))
+                _classes.append(classes[class_id])
+                _confidences.append(float(confidence))
                 boxes.append([x, y, w, h])
 
     # remove overlapping bounding boxes
-    indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
+    indices = cv2.dnn.NMSBoxes(boxes, _confidences, conf_threshold, nms_threshold)
 
     _bounding_boxes = []
     for i in indices:
         i = i[0]
         _bounding_boxes.append(boxes[i])
 
-    return _bounding_boxes
+    return _bounding_boxes, _classes, _confidences

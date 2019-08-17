@@ -8,13 +8,13 @@ from counter import is_passed_counting_line
 from utils.vehicle import generate_vehicle_id
 
 
-def create_blob(bounding_box, frame, model):
+def create_blob(bounding_box, vehicle_type, type_confidence, frame, model):
     if model == 'csrt':
-        return csrt_create(bounding_box, frame)
+        return csrt_create(bounding_box, vehicle_type, type_confidence, frame)
     if model == 'kcf':
-        return kcf_create(bounding_box, frame)
+        return kcf_create(bounding_box, vehicle_type, type_confidence, frame)
     if model == 'camshift':
-        return camshift_create(bounding_box, frame)
+        return camshift_create(bounding_box, vehicle_type, type_confidence, frame)
     else:
         raise Exception('Invalid tracker model/algorithm specified (options: csrt, kcf, camshift)')
 
@@ -27,25 +27,28 @@ def remove_stray_blobs(blobs, matched_blob_ids, mcdf):
             del blobs[_id]
     return blobs
 
-def add_new_blobs(boxes, blobs, frame, tracker, counting_line, line_position, mcdf):
+def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_line, line_position, mcdf):
     # add new blobs to existing blobs
     matched_blob_ids = []
-    for box in boxes:
-        box_centroid = get_centroid(box)
-        box_area = get_area(box)
+    for _idx in range(len(boxes)):
+        _type = classes[_idx] if classes != None else None
+        _confidence = confidences[_idx] if confidences != None else None
+
+        box_centroid = get_centroid(boxes[_idx])
+        box_area = get_area(boxes[_idx])
         match_found = False
         for _id, blob in blobs.items():
-            if blob.counted == False and box_contains_point(box, blob.centroid):
+            if blob.counted == False and box_contains_point(boxes[_idx], blob.centroid):
                 match_found = True
                 if _id not in matched_blob_ids:
                     blob.num_consecutive_detection_failures = 0
                     matched_blob_ids.append(_id)
-                temp_blob = create_blob(box, frame, tracker) # TODO: update blob w/o creating temp blob
-                blob.update(temp_blob.bounding_box, temp_blob.tracker)
+                temp_blob = create_blob(boxes[_idx], _type, _confidence, frame, tracker) # TODO: update blob w/o creating temp blob
+                blob.update(temp_blob.bounding_box, _type, _confidence, temp_blob.tracker)
                 break
 
         if not match_found and not is_passed_counting_line(box_centroid, counting_line, line_position):
-            _blob = create_blob(box, frame, tracker)
+            _blob = create_blob(boxes[_idx], _type, _confidence, frame, tracker)
             blob_id = generate_vehicle_id()
             blobs[blob_id] = _blob
 

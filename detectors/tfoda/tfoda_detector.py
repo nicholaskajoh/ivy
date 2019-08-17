@@ -27,18 +27,32 @@ def get_bounding_boxes(image):
     detections = net.forward()
 
     # get bounding boxes
-    bounding_boxes = []
+    confidence_threshold = float(os.getenv('CONFIDENCE_THRESHOLD'))
+    boxes = []
+    _classes = []
+    _confidences = []
     rows, cols, _ = image.shape
     for detection in detections[0, 0]:
         confidence = float(detection[2])
         class_id = int(detection[1])
-        if confidence > float(os.getenv('CONFIDENCE_THRESHOLD')) and class_id in classes and classes[class_id] in classes_of_interest:
+        if confidence > confidence_threshold and class_id in classes and classes[class_id] in classes_of_interest:
             left = int(detection[3] * cols)
             top = int(detection[4] * rows)
             right = int(detection[5] * cols)
             bottom = int(detection[6] * rows)
 
             x, y, w, h = left, top, right - left, bottom - top
-            bounding_boxes.append([x, y, w, h])
+            boxes.append([x, y, w, h])
+            _classes.append(classes[class_id])
+            _confidences.append(confidence)
 
-    return bounding_boxes
+    # remove overlapping bounding boxes
+    nms_threshold = 0.4
+    indices = cv2.dnn.NMSBoxes(boxes, _confidences, confidence_threshold, nms_threshold)
+
+    _bounding_boxes = []
+    for i in indices:
+        i = i[0]
+        _bounding_boxes.append(boxes[i])
+
+    return _bounding_boxes, _classes, _confidences

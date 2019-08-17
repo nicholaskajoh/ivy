@@ -25,13 +25,16 @@ class VehicleCounter():
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
         self.vehicle_count = 0 # number of vehicles counted
+        self.types_counts = OrderedDict() # counts by vehicle type
         self.counting_line = None if cl_position == None else get_counting_line(self.cl_position, self.f_width, self.f_height)
 
         # create blobs from initial frame
         droi_frame = get_roi_frame(self.frame, self.droi)
-        initial_bboxes = get_bounding_boxes(droi_frame, self.detector)
-        for box in initial_bboxes:
-            _blob = create_blob(box, self.frame, self.tracker)
+        _bounding_boxes, _classes, _confidences = get_bounding_boxes(droi_frame, self.detector)
+        for _idx in range(len(_bounding_boxes)):
+            _type = _classes[_idx] if _classes != None else None
+            _confidence = _confidences[_idx] if _confidences != None else None
+            _blob = create_blob(_bounding_boxes[_idx], _type, _confidence, self.frame, self.tracker)
             blob_id = generate_vehicle_id()
             self.blobs[blob_id] = _blob
 
@@ -65,6 +68,12 @@ class VehicleCounter():
                     not blob.counted):
                 blob.counted = True
                 self.vehicle_count += 1
+                # count by vehicle type
+                if blob.type != None:
+                    if blob.type in self.types_counts:
+                        self.types_counts[blob.type] += 1
+                    else:
+                        self.types_counts[blob.type] = 1
                 log.append({'blob_id': _id, 'count': self.vehicle_count, 'datetime': datetime.now()})
 
             if blob.num_consecutive_tracking_failures >= self.mctf:    
@@ -74,8 +83,8 @@ class VehicleCounter():
         if self.frame_count >= self.di:
             # rerun detection
             droi_frame = get_roi_frame(self.frame, self.droi)
-            boxes = get_bounding_boxes(droi_frame, self.detector)
-            self.blobs = add_new_blobs(boxes, self.blobs, self.frame, self.tracker, self.counting_line, self.cl_position, self.mcdf)
+            _bounding_boxes, _classes, _confidences = get_bounding_boxes(droi_frame, self.detector)
+            self.blobs = add_new_blobs(_bounding_boxes, _classes, _confidences, self.blobs, self.frame, self.tracker, self.counting_line, self.cl_position, self.mcdf)
             self.blobs = remove_duplicates(self.blobs)
             self.frame_count = 0
 
@@ -89,13 +98,18 @@ class VehicleCounter():
         # draw and label blob bounding boxes
         for _id, blob in self.blobs.items():
             (x, y, w, h) = [int(v) for v in blob.bounding_box]
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(frame, _id[:8], (x, y - 2), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            vehicle_label = 'ID: ' + _id[:8] \
+                            if blob.type == None \
+                            else 'ID: {0}, Type: {1} ({2})'.format(_id[:8], blob.type, str(blob.type_confidence)[:4])
+            cv2.putText(frame, vehicle_label, (x, y - 5), cv2.FONT_HERSHEY_DUPLEX, 1.2, (255, 0, 0), 2, cv2.LINE_AA)
         # draw counting line
         if self.counting_line != None:
-            cv2.line(frame, self.counting_line[0], self.counting_line[1], (0, 255, 0), 3)
+            cv2.line(frame, self.counting_line[0], self.counting_line[1], (255, 0, 0), 3)
         # display vehicle count
-        cv2.putText(frame, 'Count: ' + str(self.vehicle_count), (20, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2, cv2.LINE_AA)
+        types_counts_str = ', '.join([': '.join(map(str, i)) for i in self.types_counts.items()])
+        types_counts_str = ' (' + types_counts_str + ')' if types_counts_str != '' else types_counts_str
+        cv2.putText(frame, 'Count: ' + str(self.vehicle_count) + types_counts_str, (20, 60), cv2.FONT_HERSHEY_DUPLEX, 1.5, (255, 0, 0), 2, cv2.LINE_AA)
         # show detection roi
         if self.show_droi:
             frame = draw_roi(frame, self.droi)
