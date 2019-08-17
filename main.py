@@ -87,7 +87,7 @@ while args.iscam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_
         if args.record:
             output_video.write(output_frame)
             for item in log:
-                _row = '{0}, {1}, {2}\n'.format('v_' + str(item['blob_id']), item['count'], item['datetime'])
+                _row = '{0}, {1}, {2}\n'.format(item['blob_id'], item['count'], item['datetime'])
                 log_file.write(_row)
                 log_file.flush()
 

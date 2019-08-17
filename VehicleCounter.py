@@ -5,6 +5,7 @@ from detectors.detector import get_bounding_boxes
 from datetime import datetime
 from utils.detection_roi import get_roi_frame, draw_roi
 from counter import get_counting_line, is_passed_counting_line
+from utils.vehicle import generate_vehicle_id
 
 
 class VehicleCounter():
@@ -21,7 +22,6 @@ class VehicleCounter():
         self.cl_position = cl_position # counting line position
 
         self.blobs = OrderedDict()
-        self.blob_id = 1
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
         self.vehicle_count = 0 # number of vehicles counted
@@ -32,8 +32,8 @@ class VehicleCounter():
         initial_bboxes = get_bounding_boxes(droi_frame, self.detector)
         for box in initial_bboxes:
             _blob = create_blob(box, self.frame, self.tracker)
-            self.blobs[self.blob_id] = _blob
-            self.blob_id += 1
+            blob_id = generate_vehicle_id()
+            self.blobs[blob_id] = _blob
 
     def get_count(self):
         return self.vehicle_count
@@ -75,8 +75,7 @@ class VehicleCounter():
             # rerun detection
             droi_frame = get_roi_frame(self.frame, self.droi)
             boxes = get_bounding_boxes(droi_frame, self.detector)
-            self.blobs, current_blob_id = add_new_blobs(boxes, self.blobs, self.frame, self.tracker, self.blob_id, self.counting_line, self.cl_position, self.mcdf)
-            self.blob_id = current_blob_id
+            self.blobs = add_new_blobs(boxes, self.blobs, self.frame, self.tracker, self.counting_line, self.cl_position, self.mcdf)
             self.blobs = remove_duplicates(self.blobs)
             self.frame_count = 0
 
@@ -91,7 +90,7 @@ class VehicleCounter():
         for _id, blob in self.blobs.items():
             (x, y, w, h) = [int(v) for v in blob.bounding_box]
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(frame, 'v_' + str(_id), (x, y - 2), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(frame, _id[:8], (x, y - 2), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
         # draw counting line
         if self.counting_line != None:
             cv2.line(frame, self.counting_line[0], self.counting_line[1], (0, 255, 0), 3)

@@ -5,6 +5,7 @@ from trackers.opencv.opencv_trackers import csrt_create, kcf_create
 from trackers.camshift.camshift_tracker import camshift_create
 from blobs.utils import get_centroid, get_area, box_contains_point
 from counter import is_passed_counting_line
+from utils.vehicle import generate_vehicle_id
 
 
 def create_blob(bounding_box, frame, model):
@@ -26,7 +27,7 @@ def remove_stray_blobs(blobs, matched_blob_ids, mcdf):
             del blobs[_id]
     return blobs
 
-def add_new_blobs(boxes, blobs, frame, tracker, current_blob_id, counting_line, line_position, mcdf):
+def add_new_blobs(boxes, blobs, frame, tracker, counting_line, line_position, mcdf):
     # add new blobs to existing blobs
     matched_blob_ids = []
     for box in boxes:
@@ -45,11 +46,11 @@ def add_new_blobs(boxes, blobs, frame, tracker, current_blob_id, counting_line, 
 
         if not match_found and not is_passed_counting_line(box_centroid, counting_line, line_position):
             _blob = create_blob(box, frame, tracker)
-            blobs[current_blob_id] = _blob
-            current_blob_id += 1
+            blob_id = generate_vehicle_id()
+            blobs[blob_id] = _blob
 
     blobs = remove_stray_blobs(blobs, matched_blob_ids, mcdf)
-    return blobs, current_blob_id
+    return blobs
 
 def remove_duplicates(blobs):
     for id_a, blob_a in list(blobs.items()):
