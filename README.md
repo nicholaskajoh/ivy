@@ -12,11 +12,11 @@
 
 ### Configuration
 ```
-usage: Vehicle_Counting.py [-h] [--iscam] [--droi DROI] [--showdroi]
-                           [--mcdf MCDF] [--mctf MCTF] [--di DI]
-                           [--detector DETECTOR] [--tracker TRACKER]
-                           [--record] [--headless] [--clposition CLPOSITION]
-                           video
+usage: main.py [-h] [--iscam] [--droi DROI] [--showdroi] [--mcdf MCDF]
+               [--mctf MCTF] [--di DI] [--detector DETECTOR]
+               [--tracker TRACKER] [--record] [--headless]
+               [--clposition CLPOSITION]
+               video
 
 positional arguments:
   video                 relative/absolute path to video or camera input of
@@ -62,19 +62,19 @@ optional arguments:
 Use defaults:
 
 ```
-python Vehicle_Counting.py "./videos/sample_traffic_scene.mp4"
+python main.py "./videos/sample_traffic_scene.mp4"
 ```
 
 Custom configuration:
 
 ```
-python Vehicle_Counting.py "./videos/sample_traffic_scene.mp4" --droi "750,400|1150,400|1850,700|1850,1050|500,1050" --showdroi --detector "haarc" --tracker "csrt" --di 5 --mctf 15
+python main.py "./videos/sample_traffic_scene.mp4" --droi "750,400|1150,400|1850,700|1850,1050|500,1050" --showdroi --detector "haarc" --tracker "csrt" --di 5 --mctf 15
 ```
 
 With camera input:
 
 ```
-python Vehicle_Counting.py 1 --iscam
+python main.py 1 --iscam
 ```
 
 __NB:__ You can press the `s` key when the program is running to capture a screenshot. The images are saved in the [screenshots folder](/screenshots).
