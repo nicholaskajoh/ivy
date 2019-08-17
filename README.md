@@ -54,9 +54,11 @@ optional arguments:
 ```
 
 ### Notes
-- To use the `yolo` detector, download the [YOLO v3 weights](https://pjreddie.com/media/files/yolov3.weights) and place it in the [detectors/yolo folder](/detectors/yolo).
-- To use the `ssd` detector, download this [pre-trained model](https://drive.google.com/file/d/0BzKzrI_SkD1_WVVTSmQxU0dVRzA/view) and place it in the [detectors/ssd folder](/detectors/ssd).
+- To use the `yolo` detector (i.e You Only Look Once neural net), copy [detectors/yolo/.env.example](/detectors/yolo/.env.example) to detectors/yolo/.env and edit as appropriate. You can try out this detector [with these pre-trained models](https://pjreddie.com/darknet/yolo/).
+
 - To use the `tfoda` detector (i.e Tensorflow Object Detection API), copy [detectors/tfoda/.env.example](/detectors/tfoda/.env.example) to detectors/tfoda/.env and edit as appropriate. You can try out this detector [with these pre-trained models](https://github.com/opencv/opencv/wiki/TensorFlow-Object-Detection-API#use-existing-config-file-for-your-model).
+
+- To use the `ssd` detector, download this [pre-trained model](https://drive.google.com/file/d/0BzKzrI_SkD1_WVVTSmQxU0dVRzA/view) and place it in the [detectors/ssd folder](/detectors/ssd).
 
 ### Examples
 Use defaults:

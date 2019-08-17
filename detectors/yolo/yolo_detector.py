@@ -1,19 +1,23 @@
+"""
+Perform detection using models created with the YOLO (You Only Look Once) neural net.
+https://pjreddie.com/darknet/yolo/
+"""
+
 import cv2
 import numpy as np
 import os
+from dotenv import load_dotenv
 
 
-__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+load_dotenv()
+with open(os.getenv('CLASSES_PATH'), 'r') as classes_file:
+    classes = dict(enumerate([line.strip() for line in classes_file.readlines()]))
+with open(os.getenv('CLASSES_OF_INTEREST_PATH'), 'r') as coi_file:
+    classes_of_interest = tuple([line.strip() for line in coi_file.readlines()])
 
 def get_bounding_boxes(image):
-    # get object classes
-    classes = None
-    with open(os.path.join(__location__, 'classes.txt'), 'r') as classes_file:
-        classes = [line.strip() for line in classes_file.readlines()]
-    classes_of_interest = ['bicycle', 'car', 'motorcycle', 'bus', 'truck']
-    
     # create a YOLO v3 DNN model using pre-trained weights
-    net = cv2.dnn.readNet(os.path.join(__location__, 'yolov3.weights'), os.path.join(__location__, 'yolov3.cfg'))
+    net = cv2.dnn.readNet(os.getenv('WEIGHTS_PATH'), os.getenv('CONFIG_PATH'))
     
     # create image blob
     scale = 0.00392
@@ -28,7 +32,7 @@ def get_bounding_boxes(image):
     class_ids = []
     confidences = []
     boxes = []
-    conf_threshold = 0.5
+    conf_threshold = float(os.getenv('CONFIDENCE_THRESHOLD'))
     nms_threshold = 0.4
 
     for output in outputs:

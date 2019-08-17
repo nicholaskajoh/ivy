@@ -1,0 +1,6 @@
+*.weights
+*.cfg
+*.classes.txt
+.env
+downloads/*
+!downloads/.gitkeep
