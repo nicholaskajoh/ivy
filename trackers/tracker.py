@@ -3,7 +3,7 @@ sys.path.append('..')
 
 from trackers.opencv.opencv_trackers import csrt_create, kcf_create
 from trackers.camshift.camshift_tracker import camshift_create
-from blobs.utils import get_centroid, get_area, box_contains_point
+from blobs.utils import get_centroid, get_area, get_iou
 from counter import is_passed_counting_line
 from utils.vehicle import generate_vehicle_id
 
@@ -38,7 +38,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
         box_area = get_area(boxes[_idx])
         match_found = False
         for _id, blob in blobs.items():
-            if blob.counted == False and box_contains_point(boxes[_idx], blob.centroid):
+            if blob.counted == False and get_iou(boxes[_idx], blob.bounding_box) > 0.5:
                 match_found = True
                 if _id not in matched_blob_ids:
                     blob.num_consecutive_detection_failures = 0
@@ -61,8 +61,6 @@ def remove_duplicates(blobs):
             if blob_a == blob_b:
                 break
 
-            if box_contains_point(blob_a.bounding_box, blob_b.centroid) and id_b in blobs:
-                del blobs[id_b]
-            elif box_contains_point(blob_b.bounding_box, blob_a.centroid) and id_a in blobs:
+            if get_iou(blob_a.bounding_box, blob_b.bounding_box) > 0.5 and id_a in blobs:
                 del blobs[id_a]
     return blobs
