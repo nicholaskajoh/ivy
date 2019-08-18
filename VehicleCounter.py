@@ -64,6 +64,9 @@ class VehicleCounter():
                     not blob.counted) \
                         or \
                     (self.counting_line != None and \
+                    # don't count a blob if it was first detected at a position past the counting line
+                    # this enforces counting in only one direction
+                    not is_passed_counting_line(blob.first_detected_at, self.counting_line, self.cl_position) and \
                     is_passed_counting_line(blob.centroid, self.counting_line, self.cl_position) and \
                     not blob.counted):
                 blob.counted = True

@@ -12,6 +12,7 @@ class Blob:
         self.num_consecutive_tracking_failures = 0
         self.num_consecutive_detection_failures = 0
         self.counted = False
+        self.first_detected_at = tuple(self.centroid)
 
     def update(self, _bounding_box, _type=None, _confidence=None, _tracker=None):
         self.bounding_box = _bounding_box
