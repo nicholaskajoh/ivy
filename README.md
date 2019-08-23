@@ -55,9 +55,7 @@ optional arguments:
 
 ### Notes
 - To use the `yolo` detector (i.e You Only Look Once neural net), copy [detectors/yolo/.env.example](/detectors/yolo/.env.example) to detectors/yolo/.env and edit as appropriate. You can try out this detector [with these pre-trained models](https://pjreddie.com/darknet/yolo/).
-
 - To use the `tfoda` detector (i.e Tensorflow Object Detection API), copy [detectors/tfoda/.env.example](/detectors/tfoda/.env.example) to detectors/tfoda/.env and edit as appropriate. You can try out this detector [with these pre-trained models](https://github.com/opencv/opencv/wiki/TensorFlow-Object-Detection-API#use-existing-config-file-for-your-model).
-
 - To use the `ssd` detector, download this [pre-trained model](https://drive.google.com/file/d/0BzKzrI_SkD1_WVVTSmQxU0dVRzA/view) and place it in the [detectors/ssd folder](/detectors/ssd).
 
 ### Examples
@@ -82,7 +80,7 @@ python main.py 1 --iscam
 __NB:__ You can press the `s` key when the program is running to capture a screenshot. The images are saved in the [screenshots folder](/screenshots).
 
 ## How it works
-The vehicle counting system is made up of three main components: a detector, tracker and counter. The detector identifies vehicles in a given frame of video and returns a list of bounding boxes around the vehicles to the tracker. The tracker uses the bounding boxes to track the vehicles in subsequent frames. The detector is also used to update trackers periodically to ensure that they are still tracking the vehicles correctly. The counter draws a counting lines across the road. When a vehicle crosses the line, the vehicle count is incremented.
+The vehicle counting system is made up of three main components: a detector, tracker and counter. The detector identifies vehicles in a given frame of video and returns a list of bounding boxes around the vehicles to the tracker. The tracker uses the bounding boxes to track the vehicles in subsequent frames. The detector is also used to update the trackers periodically to ensure that they are still tracking the vehicles correctly. The counter counts vehicles when they leave the frame or makes use of a counting line drawn across a road.
 
 __PS:__ You can find out about how the vehicle counting system was built by checking out this article on my blog: https://alphacoder.xyz/vehicle-counting/.
 
