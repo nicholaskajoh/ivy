@@ -1,11 +1,11 @@
 import cv2
-import sys
 import os
 from VehicleCounter import VehicleCounter
 import numpy as np
 import uuid
 import contextlib
 import argparse
+from util.logger import take_screenshot, log_info, log_error
 
 
 # parse CLI arguments
@@ -41,7 +41,9 @@ args = parser.parse_args()
 video = int(args.video) if args.iscam else args.video
 cap = cv2.VideoCapture(video)
 if not cap.isOpened():
-    sys.exit('Error capturing video.')
+    log_error('Error capturing video. Invalid source.', {
+        'event': 'VIDEO_CAPTURE'
+    })
 ret, frame = cap.read()
 f_height, f_width, _ = frame.shape
 
@@ -78,7 +80,7 @@ if args.record:
     log_file.flush()
 
 # main loop
-print('VCS running...')
+log_info('Processing started...', { 'event': 'COUNT_PROCESS' })
 while args.iscam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
     if ret:
         log = vehicle_counter.count(frame)
@@ -93,16 +95,13 @@ while args.iscam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_
 
         if not args.headless:
             resized_frame = cv2.resize(output_frame, (858, 480))
-            cv2.imshow('tracking', resized_frame)
+            cv2.imshow('Debug', resized_frame)
 
     k = cv2.waitKey(1) & 0xFF
-    # save frame if 's' key is pressed
-    if k == ord('s'):
-        cv2.imwrite(os.path.join('screenshots', 'ss_' + uuid.uuid4().hex + '.png'), output_frame)
-        print('Screenshot taken.')
-    # end video loop if 'q' key is pressed
-    if k == ord('q'):
-        print('Video exited.')
+    if k == ord('s'): # save frame if 's' key is pressed
+        take_screenshot(output_frame)
+    if k == ord('q'): # end video loop if 'q' key is pressed
+        log_info('Processing stopped.', { 'event': 'COUNT_PROCESS' })
         break
     
     ret, frame = cap.read()
@@ -114,4 +113,4 @@ if not args.headless:
 if args.record:
     log_file.close()
     output_video.release()
-print('Processing ended.')
+log_info('Processing ended.', { 'event': 'COUNT_PROCESS' })

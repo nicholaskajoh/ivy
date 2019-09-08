@@ -5,7 +5,7 @@ from trackers.opencv.opencv_trackers import csrt_create, kcf_create
 from trackers.camshift.camshift_tracker import camshift_create
 from blobs.utils import get_centroid, get_area, get_iou
 from counter import is_passed_counting_line
-from utils.vehicle import generate_vehicle_id
+from util.vehicle_info import generate_vehicle_id
 
 
 def create_blob(bounding_box, vehicle_type, type_confidence, frame, model):

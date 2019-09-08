@@ -62,13 +62,13 @@ optional arguments:
 Use defaults:
 
 ```
-python main.py "./videos/sample_traffic_scene.mp4"
+python main.py "./data/videos/sample_traffic_scene.mp4"
 ```
 
 Custom configuration:
 
 ```
-python main.py "./videos/sample_traffic_scene.mp4" --droi "750,400|1150,400|1850,700|1850,1050|500,1050" --showdroi --detector "haarc" --tracker "csrt" --di 5 --mctf 15
+python main.py "./data/videos/sample_traffic_scene.mp4" --droi "750,400|1150,400|1850,700|1850,1050|500,1050" --showdroi --detector "haarc" --tracker "csrt" --di 5 --mctf 15
 ```
 
 With camera input:

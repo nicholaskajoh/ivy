@@ -1,7 +1,4 @@
 *.pyc
 *.caffemodel
-screenshots/*
-!screenshots/.gitkeep
-videos/*
-!videos/.gitkeep
-log.txt
+data/*
+!data/.gitkeep

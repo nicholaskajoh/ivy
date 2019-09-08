@@ -2,10 +2,11 @@ import cv2
 from trackers.tracker import create_blob, add_new_blobs, remove_duplicates
 from collections import OrderedDict
 from detectors.detector import get_bounding_boxes
-from datetime import datetime
-from utils.detection_roi import get_roi_frame, draw_roi
+import time
+from util.detection_roi import get_roi_frame, draw_roi
 from counter import get_counting_line, is_passed_counting_line
-from utils.vehicle import generate_vehicle_id
+from util.vehicle_info import generate_vehicle_id
+from util.logger import log_info
 
 
 class VehicleCounter():
@@ -54,6 +55,12 @@ class VehicleCounter():
             if success:
                 blob.num_consecutive_tracking_failures = 0
                 blob.update(box)
+                log_info('Vehicle tracker updated.', {
+                    'event': 'TRACKER_UPDATE',
+                    'vehicle_id': _id,
+                    'bounding_box': blob.bounding_box,
+                    'centroid': blob.centroid,
+                })
             else:
                 blob.num_consecutive_tracking_failures += 1
 
@@ -77,7 +84,13 @@ class VehicleCounter():
                         self.types_counts[blob.type] += 1
                     else:
                         self.types_counts[blob.type] = 1
-                log.append({'blob_id': _id, 'count': self.vehicle_count, 'datetime': datetime.now()})
+                log_info('Vehicle counted.', {
+                    'event': 'VEHICLE_COUNT',
+                    'id': _id,
+                    'type': blob.type,
+                    'count': self.vehicle_count,
+                    'counted_at':time.time(),
+                })
 
             if blob.num_consecutive_tracking_failures >= self.mctf:    
                 # delete untracked blobs
