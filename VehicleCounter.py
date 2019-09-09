@@ -1,11 +1,10 @@
 import cv2
-from trackers.tracker import create_blob, add_new_blobs, remove_duplicates
+from trackers.tracker import add_new_blobs, remove_duplicates
 from collections import OrderedDict
 from detectors.detector import get_bounding_boxes
 import time
 from util.detection_roi import get_roi_frame, draw_roi
 from counter import get_counting_line, is_passed_counting_line
-from util.vehicle_info import generate_vehicle_id
 from util.logger import log_info
 
 
@@ -32,12 +31,7 @@ class VehicleCounter():
         # create blobs from initial frame
         droi_frame = get_roi_frame(self.frame, self.droi)
         _bounding_boxes, _classes, _confidences = get_bounding_boxes(droi_frame, self.detector)
-        for _idx in range(len(_bounding_boxes)):
-            _type = _classes[_idx] if _classes != None else None
-            _confidence = _confidences[_idx] if _confidences != None else None
-            _blob = create_blob(_bounding_boxes[_idx], _type, _confidence, self.frame, self.tracker)
-            blob_id = generate_vehicle_id()
-            self.blobs[blob_id] = _blob
+        self.blobs = add_new_blobs(_bounding_boxes, _classes, _confidences, self.blobs, self.frame, self.tracker, self.counting_line, self.cl_position, self.mcdf)
 
     def get_count(self):
         return self.vehicle_count
@@ -73,7 +67,7 @@ class VehicleCounter():
                     (self.counting_line != None and \
                     # don't count a blob if it was first detected at a position past the counting line
                     # this enforces counting in only one direction
-                    not is_passed_counting_line(blob.first_detected_at, self.counting_line, self.cl_position) and \
+                    not is_passed_counting_line(blob.position_first_detected, self.counting_line, self.cl_position) and \
                     is_passed_counting_line(blob.centroid, self.counting_line, self.cl_position) and \
                     not blob.counted):
                 blob.counted = True
@@ -89,6 +83,8 @@ class VehicleCounter():
                     'id': _id,
                     'type': blob.type,
                     'count': self.vehicle_count,
+                    'position_first_detected': blob.position_first_detected,
+                    'position_counted': blob.centroid,
                     'counted_at':time.time(),
                 })
 
