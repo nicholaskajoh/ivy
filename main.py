@@ -66,32 +66,21 @@ else:
 vehicle_counter = VehicleCounter(frame, detector, tracker, droi, args.showdroi, mcdf, mctf, di, args.clposition)
 
 if args.record:
-    # initialize video object and log file to record counting
-    output_video_path='./videos/output.avi'
-    output_video = cv2.VideoWriter(output_video_path, \
-                                        cv2.VideoWriter_fourcc('M','J','P','G'), \
-                                        30, \
-                                        (f_width, f_height))
-    log_file_name='log.txt'
-    with contextlib.suppress(FileNotFoundError):
-        os.remove(log_file_name)
-    log_file = open(log_file_name, 'a')
-    log_file.write('vehicle_id, count, datetime\n')
-    log_file.flush()
+    # initialize video object to record counting
+    output_video = cv2.VideoWriter('./data/videos/output.avi', \
+                                    cv2.VideoWriter_fourcc(*'MJPG'), \
+                                    30, \
+                                    (f_width, f_height))
 
 # main loop
 log_info('Processing started...', { 'event': 'COUNT_PROCESS' })
 while args.iscam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
     if ret:
-        log = vehicle_counter.count(frame)
+        vehicle_counter.count(frame)
         output_frame = vehicle_counter.visualize()
 
         if args.record:
             output_video.write(output_frame)
-            for item in log:
-                _row = '{0}, {1}, {2}\n'.format(item['blob_id'], item['count'], item['datetime'])
-                log_file.write(_row)
-                log_file.flush()
 
         if not args.headless:
             resized_frame = cv2.resize(output_frame, (858, 480))
@@ -111,6 +100,5 @@ cap.release()
 if not args.headless:
     cv2.destroyAllWindows()
 if args.record:
-    log_file.close()
     output_video.release()
 log_info('Processing ended.', { 'event': 'COUNT_PROCESS' })

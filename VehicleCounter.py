@@ -40,7 +40,6 @@ class VehicleCounter():
         return self.blobs
 
     def count(self, frame):
-        log = []
         self.frame = frame
 
         for _id, blob in list(self.blobs.items()):
@@ -101,8 +100,6 @@ class VehicleCounter():
             self.frame_count = 0
 
         self.frame_count += 1
-
-        return log
 
     def visualize(self):
         frame = self.frame
