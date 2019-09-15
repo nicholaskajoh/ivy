@@ -1,5 +1,5 @@
 import cv2
-from trackers.tracker import add_new_blobs, remove_duplicates
+from tracker import add_new_blobs, remove_duplicates
 from collections import OrderedDict
 from detectors.detector import get_bounding_boxes
 import time

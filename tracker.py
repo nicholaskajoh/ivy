@@ -1,25 +1,29 @@
-import sys
-sys.path.append('..')
-
-from trackers.opencv.opencv_trackers import csrt_create, kcf_create
-from trackers.camshift.camshift_tracker import camshift_create
-from blobs.utils import get_centroid, get_area, get_iou
+import cv2
+from util.bounding_box import get_centroid, get_area, get_iou, get_box_image
+from util.blob import Blob
 from counter import is_passed_counting_line
 from util.vehicle_info import generate_vehicle_id
 from util.logger import log_info
-from util.bounding_box import get_box_image
 from util.image import get_base64_image
 
 
-def create_blob(bounding_box, vehicle_type, type_confidence, frame, model):
-    if model == 'csrt':
-        return csrt_create(bounding_box, vehicle_type, type_confidence, frame)
-    if model == 'kcf':
-        return kcf_create(bounding_box, vehicle_type, type_confidence, frame)
-    if model == 'camshift':
-        return camshift_create(bounding_box, vehicle_type, type_confidence, frame)
+def csrt_create(bounding_box, frame):
+    tracker = cv2.TrackerCSRT_create()
+    tracker.init(frame, tuple(bounding_box))
+    return tracker
+
+def kcf_create(bounding_box, frame):
+    tracker = cv2.TrackerKCF_create()
+    tracker.init(frame, tuple(bounding_box))
+    return tracker
+
+def get_tracker(algorithm, bounding_box, frame):
+    if algorithm == 'csrt':
+        return csrt_create(bounding_box, frame)
+    if algorithm == 'kcf':
+        return kcf_create(bounding_box, frame)
     else:
-        raise Exception('Invalid tracker model/algorithm specified (options: csrt, kcf, camshift)')
+        raise Exception('Invalid tracking algorithm specified (options: csrt, kcf)')
 
 def remove_stray_blobs(blobs, matched_blob_ids, mcdf):
     # remove blobs that hang after a tracked object has left the frame
@@ -36,6 +40,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
     for i in range(len(boxes)):
         _type = classes[i] if classes != None else None
         _confidence = confidences[i] if confidences != None else None
+        _tracker = get_tracker(tracker, boxes[i], frame)
 
         box_centroid = get_centroid(boxes[i])
         box_area = get_area(boxes[i])
@@ -46,8 +51,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
                 if _id not in matched_blob_ids:
                     blob.num_consecutive_detection_failures = 0
                     matched_blob_ids.append(_id)
-                temp_blob = create_blob(boxes[i], _type, _confidence, frame, tracker) # TODO: update blob w/o creating temp blob
-                blob.update(temp_blob.bounding_box, _type, _confidence, temp_blob.tracker)
+                blob.update(boxes[i], _type, _confidence, _tracker)
 
                 log_info('Blob updated.', {
                     'event': 'BLOB_UPSERT',
@@ -60,7 +64,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
                 break
 
         if not match_found and not is_passed_counting_line(box_centroid, counting_line, line_position):
-            _blob = create_blob(boxes[i], _type, _confidence, frame, tracker)
+            _blob = Blob(boxes[i], _type, _confidence, _tracker)
             blob_id = generate_vehicle_id()
             blobs[blob_id] = _blob
 
