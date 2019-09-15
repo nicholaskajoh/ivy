@@ -1,9 +1,6 @@
 import cv2
-import os
 import sys
-import pathlib
 import json
-import uuid
 from datetime import datetime
 
 
@@ -27,13 +24,3 @@ def log_info(message, data):
 
 def log_debug(message, data):
     send_to_stdout('DEBUG', message, data)
-
-def take_screenshot(frame):
-    screenshots_directory = 'data/screenshots'
-    pathlib.Path(screenshots_directory).mkdir(parents=True, exist_ok=True)
-    screenshot_path = os.path.join(screenshots_directory, 'img_' + uuid.uuid4().hex + '.jpg')
-    cv2.imwrite(screenshot_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
-    log_info('Screenshot captured.', {
-        'event': 'SCREENSHOT_CAPTURE',
-        'path': screenshot_path,
-    })

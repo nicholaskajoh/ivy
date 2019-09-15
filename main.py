@@ -5,7 +5,8 @@ import numpy as np
 import uuid
 import contextlib
 import argparse
-from util.logger import take_screenshot, log_info, log_error
+from util.logger import log_info, log_error
+from util.image import take_screenshot
 
 
 # parse CLI arguments
