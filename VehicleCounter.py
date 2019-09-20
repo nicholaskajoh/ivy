@@ -49,7 +49,7 @@ class VehicleCounter():
                 blob.num_consecutive_tracking_failures = 0
                 blob.update(box)
                 log_info('Vehicle tracker updated.', {
-                    'event': 'TRACKER_UPDATE',
+                    'cat': 'TRACKER_UPDATE',
                     'vehicle_id': _id,
                     'bounding_box': blob.bounding_box,
                     'centroid': blob.centroid,
@@ -78,7 +78,7 @@ class VehicleCounter():
                     else:
                         self.types_counts[blob.type] = 1
                 log_info('Vehicle counted.', {
-                    'event': 'VEHICLE_COUNT',
+                    'cat': 'VEHICLE_COUNT',
                     'id': _id,
                     'type': blob.type,
                     'count': self.vehicle_count,

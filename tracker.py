@@ -54,7 +54,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
                 blob.update(boxes[i], _type, _confidence, _tracker)
 
                 log_info('Blob updated.', {
-                    'event': 'BLOB_UPSERT',
+                    'cat': 'BLOB_UPSERT',
                     'vehicle_id': _id,
                     'bounding_box': blob.bounding_box,
                     'type': blob.type,
@@ -69,7 +69,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
             blobs[blob_id] = _blob
 
             log_info('Blob created.', {
-                'event': 'BLOB_UPSERT',
+                'cat': 'BLOB_UPSERT',
                 'vehicle_id': blob_id,
                 'bounding_box': _blob.bounding_box,
                 'type': _blob.type,

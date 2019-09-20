@@ -1,7 +1,4 @@
-import sys
-sys.path.append('..')
-
-from util.bounding_box import get_centroid, get_area
+from .bounding_box import get_centroid, get_area
 
 
 class Blob:

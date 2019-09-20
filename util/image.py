@@ -15,7 +15,7 @@ def take_screenshot(frame):
     screenshot_path = os.path.join(screenshots_directory, 'img_' + uuid.uuid4().hex + '.jpg')
     cv2.imwrite(screenshot_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
     log_info('Screenshot captured.', {
-        'event': 'SCREENSHOT_CAPTURE',
+        'cat': 'SCREENSHOT_CAPTURE',
         'path': screenshot_path,
     })
 

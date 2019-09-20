@@ -1,4 +1,4 @@
-*.pyc
-*.caffemodel
 data/*
 !data/.gitkeep
+*.pyc
+.env
