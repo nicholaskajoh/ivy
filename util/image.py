@@ -1,6 +1,3 @@
-import sys
-sys.path.append('..')
-
 import cv2
 from util.logger import log_info
 import base64

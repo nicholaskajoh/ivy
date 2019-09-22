@@ -2,3 +2,4 @@ data/*
 !data/.gitkeep
 *.pyc
 .env
+.coverage
