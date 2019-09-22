@@ -5,7 +5,7 @@ from detectors.detector import get_bounding_boxes
 import time
 from util.detection_roi import get_roi_frame, draw_roi
 from counter import get_counting_line, is_passed_counting_line
-from util.logger import log_info
+from util.logger import log_info, log_debug
 
 
 class VehicleCounter():
@@ -24,6 +24,7 @@ class VehicleCounter():
         self.blobs = OrderedDict()
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
+        self.processing_frame_rate = 0 # number of frames processed per second
         self.vehicle_count = 0 # number of vehicles counted
         self.types_counts = OrderedDict() # counts by vehicle type
         self.counting_line = None if cl_position == None else get_counting_line(self.cl_position, self.f_width, self.f_height)
@@ -40,6 +41,8 @@ class VehicleCounter():
         return self.blobs
 
     def count(self, frame):
+        _timer = cv2.getTickCount() # set timer to calculate processing frame rate
+
         self.frame = frame
 
         for _id, blob in list(self.blobs.items()):
@@ -101,6 +104,9 @@ class VehicleCounter():
 
         self.frame_count += 1
 
+        self.processing_frame_rate = round(cv2.getTickFrequency() / (cv2.getTickCount() - _timer), 2)
+        log_debug('Processing frame rate updated.', { 'cat': 'PROCESSING_SPEED', 'frame_rate': self.processing_frame_rate })
+
     def visualize(self):
         frame = self.frame
 
@@ -119,6 +125,7 @@ class VehicleCounter():
         types_counts_str = ', '.join([': '.join(map(str, i)) for i in self.types_counts.items()])
         types_counts_str = ' (' + types_counts_str + ')' if types_counts_str != '' else types_counts_str
         cv2.putText(frame, 'Count: ' + str(self.vehicle_count) + types_counts_str, (20, 60), cv2.FONT_HERSHEY_DUPLEX, 1.5, (255, 0, 0), 2, cv2.LINE_AA)
+        cv2.putText(frame, 'Processing speed: ' + str(self.processing_frame_rate) + ' FPS', (20, 120), cv2.FONT_HERSHEY_DUPLEX, 1.5, (255, 0, 0), 2, cv2.LINE_AA)
         # show detection roi
         if self.show_droi:
             frame = draw_roi(frame, self.droi)
