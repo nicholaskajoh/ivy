@@ -1,22 +1,26 @@
-"""
-Perform detection using models created with the YOLO (You Only Look Once) neural net.
+'''
+Performs vehicle detection using models created with the YOLO (You Only Look Once) neural net.
 https://pjreddie.com/darknet/yolo/
-"""
+'''
 
+import os
 import cv2
 import numpy as np
-import os
 
 
 with open(os.getenv('YOLO_CLASSES_PATH'), 'r') as classes_file:
-    classes = dict(enumerate([line.strip() for line in classes_file.readlines()]))
+    CLASSES = dict(enumerate([line.strip() for line in classes_file.readlines()]))
 with open(os.getenv('YOLO_CLASSES_OF_INTEREST_PATH'), 'r') as coi_file:
-    classes_of_interest = tuple([line.strip() for line in coi_file.readlines()])
+    CLASSES_OF_INTEREST = tuple([line.strip() for line in coi_file.readlines()])
 
 def get_bounding_boxes(image):
-    # create a YOLO v3 DNN model using pre-trained weights
+    '''
+    Returns a list of bounding boxes of vehicles detected,
+    their classes and the confidences of the detections made.
+    '''
+    # create model using weights and config
     net = cv2.dnn.readNet(os.getenv('YOLO_WEIGHTS_PATH'), os.getenv('YOLO_CONFIG_PATH'))
-    
+
     # create image blob
     scale = 0.00392
     image_blob = cv2.dnn.blobFromImage(image, scale, (416, 416), (0, 0, 0), True, crop=False)
@@ -38,7 +42,7 @@ def get_bounding_boxes(image):
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
-            if confidence > 0.5 and classes[class_id] in classes_of_interest:
+            if confidence > 0.5 and CLASSES[class_id] in CLASSES_OF_INTEREST:
                 width = image.shape[1]
                 height = image.shape[0]
                 center_x = int(detection[0] * width)
@@ -47,7 +51,7 @@ def get_bounding_boxes(image):
                 h = int(detection[3] * height)
                 x = center_x - w / 2
                 y = center_y - h / 2
-                _classes.append(classes[class_id])
+                _classes.append(CLASSES[class_id])
                 _confidences.append(float(confidence))
                 boxes.append([x, y, w, h])
 
