@@ -2,27 +2,35 @@
 VCS entry point.
 '''
 
-import ast
-import os
-
-import cv2
-from dotenv import load_dotenv
-
-from VehicleCounter import VehicleCounter
-from util.logger import log_info, log_error
-from util.image import take_screenshot
-
-
 def run():
     '''
-    Loads environment variables, initializes counter class and runs counting loop.
+    Initialize counter class and run counting loop.
     '''
+
+    import ast
+    import os
+    import sys
+
+    import cv2
+
+    from util.image import take_screenshot
+    from util.logger import get_logger
+    from VehicleCounter import VehicleCounter
+
+    logger = get_logger()
+
     # capture traffic scene video
     is_cam = ast.literal_eval(os.getenv('IS_CAM'))
     video = int(os.getenv('VIDEO')) if is_cam else os.getenv('VIDEO')
     cap = cv2.VideoCapture(video)
     if not cap.isOpened():
-        log_error('Error capturing video. Invalid source.', {'cat': 'VIDEO_CAPTURE', 'source': video})
+        logger.error('Error capturing video. Invalid source.', extra={
+            'meta': {
+                'cat': 'VIDEO_CAPTURE',
+                'source': video,
+            },
+        })
+        sys.exit(0)
     ret, frame = cap.read()
     f_height, f_width, _ = frame.shape
 
@@ -52,11 +60,23 @@ def run():
                                         30, \
                                         (f_width, f_height))
 
-    log_info('Processing started...',
-             {'cat': 'COUNT_PROCESS',
-              'counter_config': {'di': detection_interval, 'mcdf': mcdf, 'mctf': mctf, 'detector': detector,
-                                 'tracker': tracker, 'use_droi': use_droi, 'droi': droi, 'show_droi': show_droi,
-                                 'clp': counting_line_position}})
+    logger.info('Processing started.', extra={
+        'meta': {
+            'cat': 'COUNT_PROCESS',
+            'counter_config': {
+                'di': detection_interval,
+                'mcdf': mcdf,
+                'mctf': mctf,
+                'detector': detector,
+                'tracker': tracker,
+                'use_droi': use_droi,
+                'droi': droi,
+                'show_droi': show_droi,
+                'counting_line_position': counting_line_position
+            },
+        },
+    })
+
     # main loop
     while is_cam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
         if ret:
@@ -75,7 +95,7 @@ def run():
         if k == ord('s'): # save frame if 's' key is pressed
             take_screenshot(output_frame)
         if k == ord('q'): # end video loop if 'q' key is pressed
-            log_info('Processing stopped.', {'cat': 'COUNT_PROCESS'})
+            logger.info('Loop stopped.', extra={'meta': {'cat': 'COUNT_PROCESS'}})
             break
 
         ret, frame = cap.read()
@@ -86,8 +106,14 @@ def run():
         cv2.destroyAllWindows()
     if record:
         output_video.release()
-    log_info('Processing ended.', {'cat': 'COUNT_PROCESS'})
+    logger.info('Processing ended.', extra={'meta': {'cat': 'COUNT_PROCESS'}})
+
 
 if __name__ == '__main__':
+    from dotenv import load_dotenv
     load_dotenv()
+
+    from util.logger import init_logger
+    init_logger()
+
     run()

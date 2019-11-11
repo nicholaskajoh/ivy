@@ -4,9 +4,11 @@ from collections import OrderedDict
 from detectors.detector import get_bounding_boxes
 import time
 from util.detection_roi import get_roi_frame, draw_roi
+from util.logger import get_logger
 from counter import get_counting_line, is_passed_counting_line
-from util.logger import log_info, log_debug
 
+
+logger = get_logger()
 
 class VehicleCounter():
 
@@ -51,11 +53,13 @@ class VehicleCounter():
             if success:
                 blob.num_consecutive_tracking_failures = 0
                 blob.update(box)
-                log_info('Vehicle tracker updated.', {
-                    'cat': 'TRACKER_UPDATE',
-                    'vehicle_id': _id,
-                    'bounding_box': blob.bounding_box,
-                    'centroid': blob.centroid,
+                logger.debug('Vehicle tracker updated.', extra={
+                    'meta': {
+                        'cat': 'TRACKER_UPDATE',
+                        'vehicle_id': _id,
+                        'bounding_box': blob.bounding_box,
+                        'centroid': blob.centroid,
+                    },
                 })
             else:
                 blob.num_consecutive_tracking_failures += 1
@@ -80,14 +84,16 @@ class VehicleCounter():
                         self.types_counts[blob.type] += 1
                     else:
                         self.types_counts[blob.type] = 1
-                log_info('Vehicle counted.', {
-                    'cat': 'VEHICLE_COUNT',
-                    'id': _id,
-                    'type': blob.type,
-                    'count': self.vehicle_count,
-                    'position_first_detected': blob.position_first_detected,
-                    'position_counted': blob.centroid,
-                    'counted_at':time.time(),
+                logger.info('Vehicle counted.', extra={
+                    'meta': {
+                        'cat': 'VEHICLE_COUNT',
+                        'id': _id,
+                        'type': blob.type,
+                        'count': self.vehicle_count,
+                        'position_first_detected': blob.position_first_detected,
+                        'position_counted': blob.centroid,
+                        'counted_at':time.time(),
+                    },
                 })
 
             if blob.num_consecutive_tracking_failures >= self.mctf:    
@@ -105,7 +111,9 @@ class VehicleCounter():
         self.frame_count += 1
 
         self.processing_frame_rate = round(cv2.getTickFrequency() / (cv2.getTickCount() - _timer), 2)
-        log_debug('Processing frame rate updated.', { 'cat': 'PROCESSING_SPEED', 'frame_rate': self.processing_frame_rate })
+        logger.debug('Processing frame rate updated.', extra={
+            'meta': {'cat': 'PROCESSING_SPEED', 'frame_rate': self.processing_frame_rate},
+        })
 
     def visualize(self):
         frame = self.frame

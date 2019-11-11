@@ -1,28 +1,68 @@
-import cv2
-import sys
-import json
-from datetime import datetime
-import ast
+'''
+VCS logger.
+'''
+
 import os
+import ast
+import logging
+from pythonjsonlogger import jsonlogger
+
+from .job import get_job_id
 
 
-def send_to_console(level, message, data):
-    categories_to_ignore = ast.literal_eval(os.getenv('LOG_CATEGORIES_TO_IGNORE'))
-    if data['cat'] not in categories_to_ignore:
-        print('[{0}]'.format(datetime.now()), level + ':', message, json.dumps(data))
+class MetaFilter(logging.Filter):
+    '''
+    Add meta field to log if one doesn't exist.
+    '''
+    def filter(self, record):
+        if not hasattr(record, 'meta'):
+            record.meta = {}
+        return True
 
-def send_to_file():
-    pass
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    '''
+    Create custom JSON formatter.
+    '''
+    def add_fields(self, log_record, record, message_dict):
+        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        # rename fields
+        log_record['logger'] = record.name
+        log_record['level'] = record.levelname
 
-def send_to_sqs():
-    pass
+def init_logger():
+    '''
+    Setup logger.
+    '''
 
-def log_error(message, data):
-    send_to_console('ERROR', message, data)
-    sys.exit(0)
+    job_id = get_job_id()
 
-def log_info(message, data):
-    send_to_console('INFO', message, data)
+    logger = logging.getLogger(job_id)
+    logger.addFilter(MetaFilter())
+    logger.setLevel(logging.DEBUG)
 
-def log_debug(message, data):
-    send_to_console('DEBUG', message, data)
+    enable_console_logger = ast.literal_eval(os.getenv('ENABLE_CONSOLE_LOGGER', 'True'))
+    if enable_console_logger:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.INFO) # https://docs.python.org/3/library/logging.html#logging-levels
+        stream_formatter = logging.Formatter('[%(asctime)-15s] %(levelname)-8s: %(message)s %(meta)s')
+        stream_handler.setFormatter(stream_formatter)
+        logger.addHandler(stream_handler)
+
+    enable_file_logger = ast.literal_eval(os.getenv('ENABLE_FILE_LOGGER', 'True'))
+    if enable_file_logger:
+        file_name = os.getenv('LOG_FILES_DIRECTORY') + job_id + '.log'
+        file_handler = logging.FileHandler(file_name)
+        file_handler.setLevel(logging.DEBUG)
+        file_formatter = CustomJsonFormatter('(created) (logger) (level) (message)')
+        file_handler.setFormatter(file_formatter)
+        logger.addHandler(file_handler)
+
+    enable_logstash_logger = ast.literal_eval(os.getenv('ENABLE_LOGSTASH_LOGGER', 'False'))
+    if enable_logstash_logger:
+        pass
+
+def get_logger():
+    '''
+    Fetch logger.
+    '''
+    return logging.getLogger(get_job_id())

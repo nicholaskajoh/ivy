@@ -7,9 +7,11 @@ from counter import is_passed_counting_line
 from util.blob import Blob
 from util.bounding_box import get_centroid, get_overlap, get_box_image
 from util.image import get_base64_image
-from util.logger import log_info, log_error
 from util.vehicle_info import generate_vehicle_id
+from util.logger import get_logger
 
+
+logger = get_logger()
 
 def csrt_create(bounding_box, frame):
     '''
@@ -35,7 +37,9 @@ def get_tracker(algorithm, bounding_box, frame):
         return csrt_create(bounding_box, frame)
     if algorithm == 'kcf':
         return kcf_create(bounding_box, frame)
-    log_error('Invalid tracking algorithm specified (options: csrt, kcf)', {'cat': 'TRACKER_CREATE'})
+    logger.error('Invalid tracking algorithm specified (options: csrt, kcf)', extra={
+        'meta': {'cat': 'TRACKER_CREATE'},
+    })
 
 def remove_stray_blobs(blobs, matched_blob_ids, mcdf):
     '''
@@ -68,13 +72,15 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
                     matched_blob_ids.append(_id)
                 blob.update(box, _type, _confidence, _tracker)
 
-                log_info('Blob updated.', {
-                    'cat': 'BLOB_UPSERT',
-                    'vehicle_id': _id,
-                    'bounding_box': blob.bounding_box,
-                    'type': blob.type,
-                    'type_confidence': blob.type_confidence,
-                    'image': get_base64_image(get_box_image(frame, blob.bounding_box))
+                logger.debug('Blob updated.', extra={
+                    'meta': {
+                        'cat': 'BLOB_UPSERT',
+                        'vehicle_id': _id,
+                        'bounding_box': blob.bounding_box,
+                        'type': blob.type,
+                        'type_confidence': blob.type_confidence,
+                        'image': get_base64_image(get_box_image(frame, blob.bounding_box)),
+                    },
                 })
                 break
 
@@ -83,13 +89,15 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
             blob_id = generate_vehicle_id()
             blobs[blob_id] = _blob
 
-            log_info('Blob created.', {
-                'cat': 'BLOB_UPSERT',
-                'vehicle_id': blob_id,
-                'bounding_box': _blob.bounding_box,
-                'type': _blob.type,
-                'type_confidence': _blob.type_confidence,
-                'image': get_base64_image(get_box_image(frame, _blob.bounding_box))
+            logger.debug('Blob created.', extra={
+                'meta': {
+                    'cat': 'BLOB_UPSERT',
+                    'vehicle_id': blob_id,
+                    'bounding_box': _blob.bounding_box,
+                    'type': _blob.type,
+                    'type_confidence': _blob.type_confidence,
+                    'image': get_base64_image(get_box_image(frame, _blob.bounding_box)),
+                },
             })
 
     blobs = remove_stray_blobs(blobs, matched_blob_ids, mcdf)
