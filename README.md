@@ -1,5 +1,5 @@
 # Video-based Vehicle Counting System (VCS)
-![](vehicle_counting.png)
+![](vehicle_counting.jpg)
 
 ## Requirements
 - Python 3
