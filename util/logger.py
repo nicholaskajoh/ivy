@@ -5,6 +5,7 @@ VCS logger.
 import os
 import ast
 import logging
+import pathlib
 from pythonjsonlogger import jsonlogger
 
 from .job import get_job_id
@@ -50,8 +51,10 @@ def init_logger():
 
     enable_file_logger = ast.literal_eval(os.getenv('ENABLE_FILE_LOGGER', 'True'))
     if enable_file_logger:
-        file_name = os.getenv('LOG_FILES_DIRECTORY') + job_id + '.log'
-        file_handler = logging.FileHandler(file_name)
+        log_files_directory = os.getenv('LOG_FILES_DIRECTORY')
+        pathlib.Path(log_files_directory).mkdir(parents=True, exist_ok=True)
+        file_path = os.path.join(log_files_directory, job_id + '.log')
+        file_handler = logging.FileHandler(file_path)
         file_handler.setLevel(logging.DEBUG)
         file_formatter = CustomJsonFormatter('(created) (logger) (level) (message)')
         file_handler.setFormatter(file_formatter)
