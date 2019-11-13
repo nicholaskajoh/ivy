@@ -10,6 +10,7 @@ def run():
     import ast
     import os
     import sys
+    import time
 
     import cv2
 
@@ -77,8 +78,25 @@ def run():
         },
     })
 
+    is_paused = False
+    output_frame = None
+
     # main loop
     while is_cam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
+        k = cv2.waitKey(1) & 0xFF
+        if k == ord('p'): # pause/play loop if 'p' key is pressed
+            is_paused = False if is_paused else True
+            logger.info('Loop paused/played.', extra={'meta': {'cat': 'COUNT_PROCESS', 'is_paused': is_paused}})
+        if k == ord('s') and output_frame is not None: # save frame if 's' key is pressed
+            take_screenshot(output_frame)
+        if k == ord('q'): # end video loop if 'q' key is pressed
+            logger.info('Loop stopped.', extra={'meta': {'cat': 'COUNT_PROCESS'}})
+            break
+
+        if is_paused:
+            time.sleep(0.5)
+            continue
+
         if ret:
             vehicle_counter.count(frame)
             output_frame = vehicle_counter.visualize()
@@ -90,13 +108,6 @@ def run():
                 debug_window_size = ast.literal_eval(os.getenv('DEBUG_WINDOW_SIZE'))
                 resized_frame = cv2.resize(output_frame, debug_window_size)
                 cv2.imshow('Debug', resized_frame)
-
-        k = cv2.waitKey(1) & 0xFF
-        if k == ord('s'): # save frame if 's' key is pressed
-            take_screenshot(output_frame)
-        if k == ord('q'): # end video loop if 'q' key is pressed
-            logger.info('Loop stopped.', extra={'meta': {'cat': 'COUNT_PROCESS'}})
-            break
 
         ret, frame = cap.read()
 
