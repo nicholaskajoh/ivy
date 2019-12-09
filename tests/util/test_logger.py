@@ -9,12 +9,12 @@ job_id = 'job_123'
 
 @patch.dict('os.environ', {'JOB_ID': job_id})
 def test_init_logger():
-    assert job_id not in logging.root.manager.loggerDict, "job id is not initialized"
+    assert job_id not in logging.root.manager.loggerDict, 'job id is not initialized'
 
     init_logger()
-    assert job_id in logging.root.manager.loggerDict, "job id is initialized"
+    assert job_id in logging.root.manager.loggerDict, 'job id is initialized'
 
 @patch.dict('os.environ', {'JOB_ID': job_id})
 def test_get_logger():
     logger = get_logger()
-    assert logger == logging.getLogger('job_123'), "logger instance is retrieved"
+    assert logger == logging.getLogger('job_123'), 'logger instance is retrieved'
