@@ -3,7 +3,6 @@ Functions for keeping track of detected vehicles in a video.
 '''
 
 import cv2
-from counter import is_passed_counting_line
 from util.blob import Blob
 from util.bounding_box import get_centroid, get_overlap, get_box_image
 from util.image import get_base64_image
@@ -52,7 +51,7 @@ def remove_stray_blobs(blobs, matched_blob_ids, mcdf):
             del blobs[_id]
     return blobs
 
-def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_line, line_position, mcdf):
+def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
     '''
     Adds new blobs or updates existing ones.
     '''
@@ -62,10 +61,9 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
         _confidence = confidences[i] if confidences is not None else None
         _tracker = get_tracker(tracker, box, frame)
 
-        box_centroid = get_centroid(box)
         match_found = False
         for _id, blob in blobs.items():
-            if not blob.counted and get_overlap(box, blob.bounding_box) >= 0.7:
+            if get_overlap(box, blob.bounding_box) >= 0.6:
                 match_found = True
                 if _id not in matched_blob_ids:
                     blob.num_consecutive_detection_failures = 0
@@ -84,7 +82,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, counting_l
                 })
                 break
 
-        if not match_found and not is_passed_counting_line(box_centroid, counting_line, line_position):
+        if not match_found:
             _blob = Blob(box, _type, _confidence, _tracker)
             blob_id = generate_vehicle_id()
             blobs[blob_id] = _blob
@@ -112,6 +110,6 @@ def remove_duplicates(blobs):
             if blob_a == blob_b:
                 break
 
-            if get_overlap(blob_a.bounding_box, blob_b.bounding_box) >= 0.7 and _id in blobs:
+            if get_overlap(blob_a.bounding_box, blob_b.bounding_box) >= 0.6 and _id in blobs:
                 del blobs[_id]
     return blobs
