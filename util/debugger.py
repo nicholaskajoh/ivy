@@ -26,4 +26,4 @@ def capture_pixel_position(window_x, window_y, frame_w, frame_h):
     debug_window_size = ast.literal_eval(os.getenv('DEBUG_WINDOW_SIZE'))
     x = round((frame_w / debug_window_size[0]) * window_x)
     y = round((frame_h / debug_window_size[1]) * window_y)
-    logger.info('Pixel position captured.', extra={'meta': {'cat': 'DEBUG', 'position': (x, y)}})
+    logger.info('Pixel position captured.', extra={'meta': {'label': 'DEBUG', 'position': (x, y)}})

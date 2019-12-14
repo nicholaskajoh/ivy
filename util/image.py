@@ -20,7 +20,7 @@ def take_screenshot(frame):
 
     logger.info('Screenshot captured.', extra={
         'meta': {
-            'cat': 'SCREENSHOT_CAPTURE',
+            'label': 'SCREENSHOT_CAPTURE',
             'path': screenshot_path,
         },
     })

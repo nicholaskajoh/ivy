@@ -37,7 +37,7 @@ def get_tracker(algorithm, bounding_box, frame):
     if algorithm == 'kcf':
         return kcf_create(bounding_box, frame)
     logger.error('Invalid tracking algorithm specified (options: csrt, kcf)', extra={
-        'meta': {'cat': 'TRACKER_CREATE'},
+        'meta': {'label': 'TRACKER_CREATE'},
     })
 
 def remove_stray_blobs(blobs, matched_blob_ids, mcdf):
@@ -72,7 +72,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
 
                 logger.debug('Blob updated.', extra={
                     'meta': {
-                        'cat': 'BLOB_UPSERT',
+                        'label': 'BLOB_UPSERT',
                         'vehicle_id': _id,
                         'bounding_box': blob.bounding_box,
                         'type': blob.type,
@@ -89,7 +89,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
 
             logger.debug('Blob created.', extra={
                 'meta': {
-                    'cat': 'BLOB_UPSERT',
+                    'label': 'BLOB_UPSERT',
                     'vehicle_id': blob_id,
                     'bounding_box': _blob.bounding_box,
                     'type': _blob.type,
