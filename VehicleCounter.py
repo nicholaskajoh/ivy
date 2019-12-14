@@ -50,7 +50,7 @@ class VehicleCounter():
                 blob.update(box)
                 logger.debug('Vehicle tracker updated.', extra={
                     'meta': {
-                        'cat': 'TRACKER_UPDATE',
+                        'label': 'TRACKER_UPDATE',
                         'vehicle_id': _id,
                         'bounding_box': blob.bounding_box,
                         'centroid': blob.centroid,
@@ -73,7 +73,7 @@ class VehicleCounter():
 
                     logger.info('Vehicle counted.', extra={
                         'meta': {
-                            'cat': 'VEHICLE_COUNT',
+                            'label': 'VEHICLE_COUNT',
                             'id': _id,
                             'type': blob.type,
                             'counting_line': label,
@@ -100,7 +100,7 @@ class VehicleCounter():
 
         self.processing_frame_rate = round(cv2.getTickFrequency() / (cv2.getTickCount() - _timer), 2)
         logger.debug('Processing frame rate updated.', extra={
-            'meta': {'cat': 'PROCESSING_SPEED', 'frame_rate': self.processing_frame_rate},
+            'meta': {'label': 'PROCESSING_SPEED', 'frame_rate': self.processing_frame_rate},
         })
 
     def visualize(self):
