@@ -79,9 +79,10 @@ def run():
         },
     })
 
-    # capture mouse events in the debug window
-    cv2.namedWindow('Debug')
-    cv2.setMouseCallback('Debug', mouse_callback, {'frame_width': f_width, 'frame_height': f_height})
+    if not headless:
+        # capture mouse events in the debug window
+        cv2.namedWindow('Debug')
+        cv2.setMouseCallback('Debug', mouse_callback, {'frame_width': f_width, 'frame_height': f_height})
 
     is_paused = False
     output_frame = None
