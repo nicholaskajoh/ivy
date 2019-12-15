@@ -27,10 +27,7 @@ def run():
     cap = cv2.VideoCapture(video)
     if not cap.isOpened():
         logger.error('Error capturing video. Invalid source.', extra={
-            'meta': {
-                'label': 'VIDEO_CAPTURE',
-                'source': video,
-            },
+            'meta': {'label': 'VIDEO_CAPTURE', 'source': video},
         })
         sys.exit(0)
     ret, frame = cap.read()
@@ -64,7 +61,7 @@ def run():
 
     logger.info('Processing started.', extra={
         'meta': {
-            'label': 'COUNT_PROCESS',
+            'label': 'START_PROCESS',
             'counter_config': {
                 'di': detection_interval,
                 'mcdf': mcdf,
@@ -92,11 +89,11 @@ def run():
         k = cv2.waitKey(1) & 0xFF
         if k == ord('p'): # pause/play loop if 'p' key is pressed
             is_paused = False if is_paused else True
-            logger.info('Loop paused/played.', extra={'meta': {'label': 'COUNT_PROCESS', 'is_paused': is_paused}})
+            logger.info('Loop paused/played.', extra={'meta': {'label': 'PAUSE_PLAY_LOOP', 'is_paused': is_paused}})
         if k == ord('s') and output_frame is not None: # save frame if 's' key is pressed
             take_screenshot(output_frame)
         if k == ord('q'): # end video loop if 'q' key is pressed
-            logger.info('Loop stopped.', extra={'meta': {'label': 'COUNT_PROCESS'}})
+            logger.info('Loop stopped.', extra={'meta': {'label': 'STOP_LOOP'}})
             break
 
         if is_paused:
@@ -138,7 +135,7 @@ def run():
         cv2.destroyAllWindows()
     if record:
         output_video.release()
-    logger.info('Processing ended.', extra={'meta': {'label': 'COUNT_PROCESS'}})
+    logger.info('Processing ended.', extra={'meta': {'label': 'END_PROCESS'}})
 
 
 if __name__ == '__main__':

@@ -72,7 +72,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
 
                 logger.debug('Blob updated.', extra={
                     'meta': {
-                        'label': 'BLOB_UPSERT',
+                        'label': 'BLOB_UPDATE',
                         'vehicle_id': _id,
                         'bounding_box': blob.bounding_box,
                         'type': blob.type,
@@ -89,7 +89,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
 
             logger.debug('Blob created.', extra={
                 'meta': {
-                    'label': 'BLOB_UPSERT',
+                    'label': 'BLOB_CREATE',
                     'vehicle_id': blob_id,
                     'bounding_box': _blob.bounding_box,
                     'type': _blob.type,

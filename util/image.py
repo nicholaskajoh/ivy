@@ -19,10 +19,7 @@ def take_screenshot(frame):
     cv2.imwrite(screenshot_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
 
     logger.info('Screenshot captured.', extra={
-        'meta': {
-            'label': 'SCREENSHOT_CAPTURE',
-            'path': screenshot_path,
-        },
+        'meta': {'label': 'SCREENSHOT_CAPTURE', 'path': screenshot_path},
     })
 
 def get_base64_image(image):
