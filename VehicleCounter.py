@@ -26,7 +26,6 @@ class VehicleCounter():
         self.blobs = OrderedDict()
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
-        self.processing_frame_rate = 0 # number of frames processed per second
         self.counts_by_type_per_line = {counting_line['label']: {} for counting_line in counting_lines} # counts of vehicles by type for each counting line
 
         # create blobs from initial frame
@@ -38,8 +37,6 @@ class VehicleCounter():
         return self.blobs
 
     def count(self, frame):
-        _timer = cv2.getTickCount() # set timer to calculate processing frame rate
-
         self.frame = frame
 
         for _id, blob in list(self.blobs.items()):
@@ -98,11 +95,6 @@ class VehicleCounter():
 
         self.frame_count += 1
 
-        self.processing_frame_rate = round(cv2.getTickFrequency() / (cv2.getTickCount() - _timer), 2)
-        logger.debug('Processing frame rate updated.', extra={
-            'meta': {'label': 'PROCESSING_SPEED', 'frame_rate': self.processing_frame_rate},
-        })
-
     def visualize(self):
         frame = self.frame
         font = cv2.FONT_HERSHEY_DUPLEX
@@ -112,9 +104,9 @@ class VehicleCounter():
         for _id, blob in self.blobs.items():
             (x, y, w, h) = [int(v) for v in blob.bounding_box]
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            vehicle_label = 'ID: ' + _id[:8] \
+            vehicle_label = 'I: ' + _id[:8] \
                             if blob.type is None \
-                            else 'ID: {0}, Type: {1} ({2})'.format(_id[:8], blob.type, str(blob.type_confidence)[:4])
+                            else 'I: {0}, T: {1} ({2})'.format(_id[:8], blob.type, str(blob.type_confidence)[:4])
             cv2.putText(frame, vehicle_label, (x, y - 5), font, 1, (255, 0, 0), 2, line_type)
 
         # draw counting lines
@@ -126,8 +118,5 @@ class VehicleCounter():
         # show detection roi
         if self.show_droi:
             frame = draw_roi(frame, self.droi)
-
-        # display processing speed
-        cv2.putText(frame, str(self.processing_frame_rate) + ' FPS', (10, 30), font, 1, (255, 0, 0), 2, line_type)
 
         return frame
