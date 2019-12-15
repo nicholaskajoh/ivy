@@ -103,6 +103,8 @@ def run():
             time.sleep(0.5)
             continue
 
+        _timer = cv2.getTickCount() # set timer to calculate processing frame rate
+
         if ret:
             vehicle_counter.count(frame)
             output_frame = vehicle_counter.visualize()
@@ -114,6 +116,19 @@ def run():
                 debug_window_size = ast.literal_eval(os.getenv('DEBUG_WINDOW_SIZE'))
                 resized_frame = cv2.resize(output_frame, debug_window_size)
                 cv2.imshow('Debug', resized_frame)
+
+        processing_frame_rate = round(cv2.getTickFrequency() / (cv2.getTickCount() - _timer), 2)
+        frames_processed = round(cap.get(cv2.CAP_PROP_POS_FRAMES))
+        frames_count = round(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        logger.debug('Frame processed.', extra={
+            'meta': {
+                'label': 'FRAME_PROCESS',
+                'frames_processed': frames_processed,
+                'frame_rate': processing_frame_rate,
+                'frames_left': frames_count - frames_processed,
+                'percentage_processed': round((frames_processed / frames_count) * 100, 2),
+            },
+        })
 
         ret, frame = cap.read()
 
