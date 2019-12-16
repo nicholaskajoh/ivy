@@ -16,7 +16,7 @@ class VehicleCounter():
         self.frame = initial_frame # current frame of video
         self.detector = detector
         self.tracker = tracker
-        self.droi =  droi # detection region of interest
+        self.droi = droi # detection region of interest
         self.show_droi = show_droi
         self.mcdf = mcdf # maximum consecutive detection failures
         self.mctf = mctf # maximum consecutive tracking failures

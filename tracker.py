@@ -12,17 +12,17 @@ from util.logger import get_logger
 
 logger = get_logger()
 
-def csrt_create(bounding_box, frame):
+def _csrt_create(bounding_box, frame):
     '''
-    Creates an OpenCV CSRT Tracker object.
+    Create an OpenCV CSRT Tracker object.
     '''
     tracker = cv2.TrackerCSRT_create()
     tracker.init(frame, tuple(bounding_box))
     return tracker
 
-def kcf_create(bounding_box, frame):
+def _kcf_create(bounding_box, frame):
     '''
-    Creates an OpenCV KCF Tracker object.
+    Create an OpenCV KCF Tracker object.
     '''
     tracker = cv2.TrackerKCF_create()
     tracker.init(frame, tuple(bounding_box))
@@ -30,19 +30,19 @@ def kcf_create(bounding_box, frame):
 
 def get_tracker(algorithm, bounding_box, frame):
     '''
-    Fetches a tracker object based on the algorithm specified.
+    Fetch a tracker object based on the algorithm specified.
     '''
     if algorithm == 'csrt':
-        return csrt_create(bounding_box, frame)
+        return _csrt_create(bounding_box, frame)
     if algorithm == 'kcf':
-        return kcf_create(bounding_box, frame)
-    logger.error('Invalid tracking algorithm specified (options: csrt, kcf)', extra={
+        return _kcf_create(bounding_box, frame)
+    logger.error('Invalid tracking algorithm specified (options: csrt, kcf, dlib)', extra={
         'meta': {'label': 'TRACKER_CREATE'},
     })
 
-def remove_stray_blobs(blobs, matched_blob_ids, mcdf):
+def _remove_stray_blobs(blobs, matched_blob_ids, mcdf):
     '''
-    Removes blobs that "hang" after a tracked object has left the frame.
+    Remove blobs that "hang" after a tracked object has left the frame.
     '''
     for _id, blob in list(blobs.items()):
         if _id not in matched_blob_ids:
@@ -53,7 +53,7 @@ def remove_stray_blobs(blobs, matched_blob_ids, mcdf):
 
 def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
     '''
-    Adds new blobs or updates existing ones.
+    Add new blobs or updates existing ones.
     '''
     matched_blob_ids = []
     for i, box in enumerate(boxes):
@@ -98,12 +98,12 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
                 },
             })
 
-    blobs = remove_stray_blobs(blobs, matched_blob_ids, mcdf)
+    blobs = _remove_stray_blobs(blobs, matched_blob_ids, mcdf)
     return blobs
 
 def remove_duplicates(blobs):
     '''
-    Removes duplicate blobs i.e blobs that point to an already detected and tracked vehicle.
+    Remove duplicate blobs i.e blobs that point to an already detected and tracked vehicle.
     '''
     for _id, blob_a in list(blobs.items()):
         for _, blob_b in list(blobs.items()):
