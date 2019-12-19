@@ -36,7 +36,7 @@ def get_tracker(algorithm, bounding_box, frame):
         return _csrt_create(bounding_box, frame)
     if algorithm == 'kcf':
         return _kcf_create(bounding_box, frame)
-    logger.error('Invalid tracking algorithm specified (options: csrt, kcf, dlib)', extra={
+    logger.error('Invalid tracking algorithm specified (options: csrt, kcf)', extra={
         'meta': {'label': 'TRACKER_CREATE'},
     })
 
@@ -44,11 +44,11 @@ def _remove_stray_blobs(blobs, matched_blob_ids, mcdf):
     '''
     Remove blobs that "hang" after a tracked object has left the frame.
     '''
-    for _id, blob in list(blobs.items()):
-        if _id not in matched_blob_ids:
+    for blob_id, blob in list(blobs.items()):
+        if blob_id not in matched_blob_ids:
             blob.num_consecutive_detection_failures += 1
         if blob.num_consecutive_detection_failures > mcdf:
-            del blobs[_id]
+            del blobs[blob_id]
     return blobs
 
 def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
@@ -105,11 +105,32 @@ def remove_duplicates(blobs):
     '''
     Remove duplicate blobs i.e blobs that point to an already detected and tracked vehicle.
     '''
-    for _id, blob_a in list(blobs.items()):
+    for blob_id, blob_a in list(blobs.items()):
         for _, blob_b in list(blobs.items()):
             if blob_a == blob_b:
                 break
 
-            if get_overlap(blob_a.bounding_box, blob_b.bounding_box) >= 0.6 and _id in blobs:
-                del blobs[_id]
+            if get_overlap(blob_a.bounding_box, blob_b.bounding_box) >= 0.6 and blob_id in blobs:
+                del blobs[blob_id]
     return blobs
+
+def update_blob_tracker(blob, blob_id, frame):
+    '''
+    Update a blob's tracker object.
+    '''
+    success, box = blob.tracker.update(frame)
+    if success:
+        blob.num_consecutive_tracking_failures = 0
+        blob.update(box)
+        logger.debug('Vehicle tracker updated.', extra={
+            'meta': {
+                'label': 'TRACKER_UPDATE',
+                'vehicle_id': blob_id,
+                'bounding_box': blob.bounding_box,
+                'centroid': blob.centroid,
+            },
+        })
+    else:
+        blob.num_consecutive_tracking_failures += 1
+
+    return (blob_id, blob)

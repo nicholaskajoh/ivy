@@ -1,14 +1,16 @@
 import cv2
-from tracker import add_new_blobs, remove_duplicates
-from collections import OrderedDict
+from joblib import Parallel, delayed
+import multiprocessing
+
+from tracker import add_new_blobs, remove_duplicates, update_blob_tracker
 from detectors.detector import get_bounding_boxes
-import time
 from util.detection_roi import get_roi_frame, draw_roi
 from util.logger import get_logger
-from counter import has_crossed_counting_line
+from counter import attempt_count
 
 
 logger = get_logger()
+num_cores = multiprocessing.cpu_count()
 
 class VehicleCounter():
 
@@ -23,10 +25,10 @@ class VehicleCounter():
         self.di = di # detection interval
         self.counting_lines = counting_lines
 
-        self.blobs = OrderedDict()
+        self.blobs = {}
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
-        self.counts_by_type_per_line = {counting_line['label']: {} for counting_line in counting_lines} # counts of vehicles by type for each counting line
+        self.counts = {counting_line['label']: {} for counting_line in counting_lines} # counts of vehicles by type for each counting line
 
         # create blobs from initial frame
         droi_frame = get_roi_frame(self.frame, self.droi)
@@ -38,52 +40,21 @@ class VehicleCounter():
 
     def count(self, frame):
         self.frame = frame
+        blobs_list = list(self.blobs.items())
 
-        for _id, blob in list(self.blobs.items()):
-            # update trackers
-            success, box = blob.tracker.update(self.frame)
-            if success:
-                blob.num_consecutive_tracking_failures = 0
-                blob.update(box)
-                logger.debug('Vehicle tracker updated.', extra={
-                    'meta': {
-                        'label': 'TRACKER_UPDATE',
-                        'vehicle_id': _id,
-                        'bounding_box': blob.bounding_box,
-                        'centroid': blob.centroid,
-                    },
-                })
-            else:
-                blob.num_consecutive_tracking_failures += 1
+        blobs_list = Parallel(n_jobs=num_cores, prefer='threads')(
+            delayed(update_blob_tracker)(blob, blob_id, self.frame) for blob_id, blob in blobs_list
+        )
+        self.blobs = dict(blobs_list)
 
+        for blob_id, blob in blobs_list:
             # count vehicle if it has crossed a counting line
-            for counting_line in self.counting_lines:
-                label = counting_line['label']
-                if has_crossed_counting_line(blob.bounding_box, counting_line['line']) and \
-                        label not in blob.lines_crossed:
-                    if blob.type in self.counts_by_type_per_line[label]:
-                        self.counts_by_type_per_line[label][blob.type] += 1
-                    else:
-                        self.counts_by_type_per_line[label][blob.type] = 1
+            blob, self.counts = attempt_count(blob, blob_id, self.counting_lines, self.counts)
+            self.blobs[blob_id] = blob
 
-                    blob.lines_crossed.append(label)
-
-                    logger.info('Vehicle counted.', extra={
-                        'meta': {
-                            'label': 'VEHICLE_COUNT',
-                            'id': _id,
-                            'type': blob.type,
-                            'counting_line': label,
-                            'position_first_detected': blob.position_first_detected,
-                            'position_counted': blob.centroid,
-                            'counted_at':time.time(),
-                            'counts_by_type_per_line': self.counts_by_type_per_line,
-                        },
-                    })
-
+            # remove blob if it has reached the limit for tracking failures
             if blob.num_consecutive_tracking_failures >= self.mctf:
-                # delete untracked blobs
-                del self.blobs[_id]
+                del self.blobs[blob_id]
 
         if self.frame_count >= self.di:
             # rerun detection
