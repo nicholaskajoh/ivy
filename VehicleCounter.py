@@ -40,8 +40,9 @@ class VehicleCounter():
 
     def count(self, frame):
         self.frame = frame
-        blobs_list = list(self.blobs.items())
 
+        blobs_list = list(self.blobs.items())
+        # update blob trackers
         blobs_list = Parallel(n_jobs=num_cores, prefer='threads')(
             delayed(update_blob_tracker)(blob, blob_id, self.frame) for blob_id, blob in blobs_list
         )

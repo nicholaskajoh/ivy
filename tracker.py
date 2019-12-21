@@ -36,9 +36,8 @@ def get_tracker(algorithm, bounding_box, frame):
         return _csrt_create(bounding_box, frame)
     if algorithm == 'kcf':
         return _kcf_create(bounding_box, frame)
-    logger.error('Invalid tracking algorithm specified (options: csrt, kcf)', extra={
-        'meta': {'label': 'TRACKER_CREATE'},
-    })
+
+    raise Exception('Invalid tracking algorithm specified (options: csrt, kcf)')
 
 def _remove_stray_blobs(blobs, matched_blob_ids, mcdf):
     '''

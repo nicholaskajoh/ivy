@@ -26,10 +26,7 @@ def run():
     video = int(os.getenv('VIDEO')) if is_cam else os.getenv('VIDEO')
     cap = cv2.VideoCapture(video)
     if not cap.isOpened():
-        logger.error('Error capturing video. Invalid source.', extra={
-            'meta': {'label': 'VIDEO_CAPTURE', 'source': video},
-        })
-        sys.exit(0)
+        raise Exception('Invalid video source {0}'.format(video))
     ret, frame = cap.read()
     f_height, f_width, _ = frame.shape
 
