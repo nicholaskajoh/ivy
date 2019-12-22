@@ -14,6 +14,7 @@ with open(os.getenv('YOLO_CLASSES_OF_INTEREST_PATH'), 'r') as coi_file:
     CLASSES_OF_INTEREST = tuple([line.strip() for line in coi_file.readlines()])
 
 use_gpu = ast.literal_eval(os.getenv('ENABLE_GPU_ACCELERATION'))
+conf_threshold = float(os.getenv('YOLO_CONFIDENCE_THRESHOLD'))
 
 # initialize model with weights and config
 if use_gpu:
@@ -41,7 +42,6 @@ def get_bounding_boxes_cpu(image):
     _classes = []
     _confidences = []
     boxes = []
-    conf_threshold = float(os.getenv('YOLO_CONFIDENCE_THRESHOLD'))
     nms_threshold = 0.4
 
     for output in outputs:
@@ -49,7 +49,7 @@ def get_bounding_boxes_cpu(image):
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
-            if confidence > 0.5 and CLASSES[class_id] in CLASSES_OF_INTEREST:
+            if confidence > conf_threshold and CLASSES[class_id] in CLASSES_OF_INTEREST:
                 width = image.shape[1]
                 height = image.shape[0]
                 center_x = int(detection[0] * width)
@@ -81,7 +81,7 @@ def get_bounding_boxes_gpu(img):
     _bounding_boxes, _classes, _confidences = [], [], []
     for cat, score, bounds in results:
         _class = str(cat.decode('utf-8'))
-        if _class in CLASSES_OF_INTEREST:
+        if score > conf_threshold and _class in CLASSES_OF_INTEREST:
             _bounding_boxes.append(bounds)
             _classes.append(_class)
             _confidences.append(score)
