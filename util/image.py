@@ -16,7 +16,7 @@ def take_screenshot(frame):
     screenshots_directory = 'data/screenshots'
     pathlib.Path(screenshots_directory).mkdir(parents=True, exist_ok=True)
     screenshot_path = os.path.join(screenshots_directory, 'img_' + uuid.uuid4().hex + '.jpg')
-    cv2.imwrite(screenshot_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+    cv2.imwrite(screenshot_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
 
     logger.info('Screenshot captured.', extra={
         'meta': {'label': 'SCREENSHOT_CAPTURE', 'path': screenshot_path},
