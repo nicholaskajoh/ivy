@@ -11,7 +11,7 @@ def run():
     import os
     import sys
     import time
-
+    import numpy as np
     import cv2
 
     from util.image import take_screenshot
@@ -132,7 +132,9 @@ def run():
         cv2.destroyAllWindows()
     if record:
         output_video.release()
-    logger.info('Processing ended.', extra={'meta': {'label': 'END_PROCESS'}})
+    logger.info('Processing ended.', extra={'meta': {'label': 'END_PROCESS', 
+        'average_detection_ms': int(np.mean(vehicle_counter.detection_times)),
+        'average_tracking_ms': int(np.mean(vehicle_counter.tracking_times))}})
 
 
 if __name__ == '__main__':
@@ -142,4 +144,9 @@ if __name__ == '__main__':
     from util.logger import init_logger
     init_logger()
 
+    import time
+    time0 = time.time()
     run()
+    time1 = time.time()
+
+    print("Video took {} seconds".format(time1 - time0))
