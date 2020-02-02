@@ -14,7 +14,7 @@ num_cores = multiprocessing.cpu_count()
 
 class VehicleCounter():
 
-    def __init__(self, initial_frame, detector, tracker, droi, show_droi, mcdf, mctf, di, counting_lines):
+    def __init__(self, initial_frame, detector, tracker, droi, show_droi, mcdf, mctf, di, counting_lines, draw_counts):
         self.frame = initial_frame # current frame of video
         self.detector = detector
         self.tracker = tracker
@@ -29,6 +29,7 @@ class VehicleCounter():
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
         self.counts = {counting_line['label']: {} for counting_line in counting_lines} # counts of vehicles by type for each counting line
+        self.draw_counts = draw_counts
 
         # create blobs from initial frame
         droi_frame = get_roi_frame(self.frame, self.droi)
@@ -91,5 +92,17 @@ class VehicleCounter():
         # show detection roi
         if self.show_droi:
             frame = draw_roi(frame, self.droi)
+        
+        # For each line, write the cumulative count on the video (note if you're detecting lots
+        # of different classes, this may overflow off the bottom of the video).
+        if self.draw_counts:
+            offset = 1
+            for line, objects in self.counts.items():
+                cv2.putText(frame, line, (10, 40 * offset), font, 1, (255, 0, 0), 2, line_type)
+                offset += 1
+
+                for label, count in objects.items():
+                    cv2.putText(frame, "{}: {}".format(label, count), (10, 40 * offset), font, 1, (255, 0, 0), 2, line_type)
+                    offset += 1
 
         return frame

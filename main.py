@@ -42,9 +42,10 @@ def run():
             else [(0, 0), (f_width, 0), (f_width, f_height), (0, f_height)]
     show_droi = ast.literal_eval(os.getenv('SHOW_DROI'))
     counting_lines = ast.literal_eval(os.getenv('COUNTING_LINES'))
+    draw_counts = ast.literal_eval(os.getenv('DRAW_COUNTS'))
 
     vehicle_counter = VehicleCounter(frame, detector, tracker, droi, show_droi, mcdf,
-                                     mctf, detection_interval, counting_lines)
+                                     mctf, detection_interval, counting_lines, draw_counts)
 
     record = ast.literal_eval(os.getenv('RECORD'))
     headless = ast.literal_eval(os.getenv('HEADLESS'))
