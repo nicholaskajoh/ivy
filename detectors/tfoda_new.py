@@ -28,7 +28,6 @@ with open(os.getenv('TFODA_CLASSES_PATH'), 'r') as classes_file:
     CLASSES = dict(enumerate([line.strip() for line in classes_file.readlines()]))
 
 confidence_threshold = float(os.getenv('TFODA_CONFIDENCE_THRESHOLD'))
-model_dir = os.path.join(os.getenv('TFODA_WEIGHTS_PATH'), "saved_model")
 model_dir = os.getenv('TFODA_WEIGHTS_PATH')
 
 model = tf.saved_model.load(str(model_dir))
@@ -36,14 +35,8 @@ model = model.signatures['serving_default']
 
 def get_bounding_boxes(image):
     image = image[:, :, ::-1]
-    # print(type(img))
-    # the array based representation of the image will be used later in order to prepare the
-    # result image with boxes and labels on it.
-    # img_w, img_h = img.size
-    # image_np = np.array(img)
     img_h, img_w, _ = image.shape
 
-    # image = np.asarray(image_np)
     # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
     input_tensor = tf.convert_to_tensor(image)
     # The model expects a batch of images, so add an axis with `tf.newaxis`.
@@ -75,8 +68,5 @@ def get_bounding_boxes(image):
       _classes.append(coco_class)
       _confidences.append(score)
       _bounding_boxes.append(this_box)
-    #   items.append({'class': coco_class,
-    #               'score': score,
-    #               'bbox': this_box})
       
     return _bounding_boxes, _classes, _confidences
