@@ -17,6 +17,6 @@ def get_bounding_boxes(frame, model):
     elif model == 'tfoda_new':
         from detectors.tfoda_new import get_bounding_boxes as gbb
     else:
-        raise Exception('Invalid detector model, algorithm or API specified (options: yolo, tfoda, haarcascade)')
+        raise Exception('Invalid detector model, algorithm or API specified (options: yolo, tfoda, tfoda_new, haarcascade)')
 
     return gbb(frame)
