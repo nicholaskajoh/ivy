@@ -1,42 +1,34 @@
 '''
-Performs vehicle detection using models created with the YOLO (You Only Look Once) neural net.
-https://pjreddie.com/darknet/yolo/
+Performs detection using models created with FAIRs Detectron2 Framework.
+https://github.com/facebookresearch/detectron2
 '''
 
 import ast
 import os
 import cv2
 import torch
-
-import detectron2
-from detectron2.utils.logger import setup_logger
-setup_logger()
-
-# import some common libraries
 import numpy as np
 import random
 
-# import some common detectron2 utilities
+import detectron2
+from detectron2.utils.logger import setup_logger
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog
+
+setup_logger()
 
 with open(os.getenv('DETECTRON2_CLASSES_PATH'), 'r') as classes_file:
     CLASSES = dict(enumerate([line.strip() for line in classes_file.readlines()]))
 with open(os.getenv('DETECTRON2_CLASSES_OF_INTEREST_PATH'), 'r') as coi_file:
     CLASSES_OF_INTEREST = tuple([line.strip() for line in coi_file.readlines()])
 
-use_gpu = ast.literal_eval(os.getenv('ENABLE_GPU_ACCELERATION'))
-conf_threshold = float(os.getenv('DETECTRON2_CONFIDENCE_THRESHOLD'))
-
-# # initialize model with weights and config
+# initialize model with weights and config
 cfg = get_cfg()
 cfg.merge_from_file(os.getenv('DETECTRON2_CONFIG_PATH'))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
-# Find a model from detectron2's model zoo. You can either use the https://dl.fbaipublicfiles.... url, or use the following shorthand
 cfg.MODEL.WEIGHTS = os.getenv('DETECTRON2_WEIGHTS_PATH')
-cfg.MODEL.ROI_HEADS.NUM_CLASSES = int(os.getenv('DETECTRON2_NUM_CLASSES'))  # only has one class (ballon)
+cfg.MODEL.ROI_HEADS.NUM_CLASSES = int(os.getenv('DETECTRON2_NUM_CLASSES'))
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = float(os.getenv('DETECTRON2_CONFIDENCE_THRESHOLD'))
 cfg.DATALOADER.NUM_WORKERS = 2
 
