@@ -68,5 +68,5 @@ def get_bounding_boxes(image):
         _classes.append(coco_class)
         _confidences.append(score)
         _bounding_boxes.append(this_box)
-      
+
     return _bounding_boxes, _classes, _confidences
