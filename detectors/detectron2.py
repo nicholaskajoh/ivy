@@ -32,11 +32,14 @@ cfg.MODEL.ROI_HEADS.NUM_CLASSES = int(os.getenv('DETECTRON2_NUM_CLASSES'))
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = float(os.getenv('DETECTRON2_CONFIDENCE_THRESHOLD'))
 cfg.DATALOADER.NUM_WORKERS = 2
 
+from util.logger import get_logger
+logger = get_logger()
+
 if not torch.cuda.is_available():
-    print("No GPU available, using CPU")
+    logger.debug('No GPU available, using CPU')
     cfg.MODEL.DEVICE = 'cpu'
 else:
-    print("GPU Available, using GPU")
+    logger.debug('GPU Available, using GPU')
     cfg.MODEL.DEVICE = 'cuda'
 
 predictor = DefaultPredictor(cfg)
