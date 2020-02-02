@@ -45,6 +45,15 @@ else:
 predictor = DefaultPredictor(cfg)
 
 def convert_box_to_array(this_box):
+    '''
+    Detectron2 returns results as a Boxes class 
+    (https://detectron2.readthedocs.io/modules/structures.html#detectron2.structures.Boxes).
+    These have a lot of useful extra methods (computing area etc) however can't be easily
+    serialized, so it's a pain to transfer these predictions over the internet (e.g., if
+    this is being used in the cloud, and wanting to send predictions back) so this method
+    converts it into a standard array format. It also returns results in (x1, y1, x2, y2) 
+    format, so this method converts it into (x1, y1, w, h).
+    '''
     res = []
     for val in this_box:
         for ind_val in val:
