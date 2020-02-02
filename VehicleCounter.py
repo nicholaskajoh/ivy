@@ -35,9 +35,6 @@ class VehicleCounter():
         _bounding_boxes, _classes, _confidences = get_bounding_boxes(droi_frame, self.detector)
         self.blobs = add_new_blobs(_bounding_boxes, _classes, _confidences, self.blobs, self.frame, self.tracker, self.mcdf)
 
-        self.detection_times = []
-        self.tracking_times = []
-
     def get_blobs(self):
         return self.blobs
 
@@ -45,13 +42,10 @@ class VehicleCounter():
         self.frame = frame
 
         blobs_list = list(self.blobs.items())
-        start_time = datetime.datetime.now()
         # update blob trackers
         blobs_list = Parallel(n_jobs=num_cores, prefer='threads')(
             delayed(update_blob_tracker)(blob, blob_id, self.frame) for blob_id, blob in blobs_list
         )
-        elapsed = datetime.datetime.now() - start_time
-        self.tracking_times.append(elapsed.total_seconds() * 1000)
         self.blobs = dict(blobs_list)
 
         for blob_id, blob in blobs_list:
@@ -66,10 +60,7 @@ class VehicleCounter():
         if self.frame_count >= self.di:
             # rerun detection
             droi_frame = get_roi_frame(self.frame, self.droi)
-            start_time = datetime.datetime.now()
             _bounding_boxes, _classes, _confidences = get_bounding_boxes(droi_frame, self.detector)
-            elapsed = datetime.datetime.now() - start_time
-            self.detection_times.append(elapsed.total_seconds()*1000)
 
             self.blobs = add_new_blobs(_bounding_boxes, _classes, _confidences, self.blobs, self.frame, self.tracker, self.mcdf)
             self.blobs = remove_duplicates(self.blobs)
