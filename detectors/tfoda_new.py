@@ -60,13 +60,13 @@ def get_bounding_boxes(image):
     _bounding_boxes = []
 
     for i, pred in enumerate(output_dict['detection_classes']):
-      score = round(float(output_dict['detection_scores'][i]), 3)
-      if score < 0.5:
-        continue
-      coco_class = CLASSES[int(pred)]
-      this_box = scale_box_coords(output_dict['detection_boxes'][i], img_w, img_h)
-      _classes.append(coco_class)
-      _confidences.append(score)
-      _bounding_boxes.append(this_box)
+        score = round(float(output_dict['detection_scores'][i]), 3)
+        if score < confidence_threshold:
+            continue
+        coco_class = CLASSES[int(pred)]
+        this_box = scale_box_coords(output_dict['detection_boxes'][i], img_w, img_h)
+        _classes.append(coco_class)
+        _confidences.append(score)
+        _bounding_boxes.append(this_box)
       
     return _bounding_boxes, _classes, _confidences
