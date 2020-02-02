@@ -144,9 +144,4 @@ if __name__ == '__main__':
     from util.logger import init_logger
     init_logger()
 
-    import time
-    time0 = time.time()
     run()
-    time1 = time.time()
-
-    print("Video took {} seconds".format(time1 - time0))
