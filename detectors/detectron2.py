@@ -86,7 +86,6 @@ def get_bounding_boxes(image):
         score = round(float(outputs['instances'].scores[i]), 3)
         _confidences.append(score)
 
-
         this_box = outputs['instances'].pred_boxes[i]
         box_vals = convert_box_to_array(this_box)
         _bounding_boxes.append(box_vals)
