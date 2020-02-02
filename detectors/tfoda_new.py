@@ -29,6 +29,7 @@ with open(os.getenv('TFODA_CLASSES_PATH'), 'r') as classes_file:
 
 confidence_threshold = float(os.getenv('TFODA_CONFIDENCE_THRESHOLD'))
 model_dir = os.path.join(os.getenv('TFODA_WEIGHTS_PATH'), "saved_model")
+model_dir = os.getenv('TFODA_WEIGHTS_PATH')
 
 model = tf.saved_model.load(str(model_dir))
 model = model.signatures['serving_default']
