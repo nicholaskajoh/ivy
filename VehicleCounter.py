@@ -8,13 +8,12 @@ from util.detection_roi import get_roi_frame, draw_roi
 from util.logger import get_logger
 from counter import attempt_count
 
-
 logger = get_logger()
 num_cores = multiprocessing.cpu_count()
 
 class VehicleCounter():
 
-    def __init__(self, initial_frame, detector, tracker, droi, show_droi, mcdf, mctf, di, counting_lines):
+    def __init__(self, initial_frame, detector, tracker, droi, show_droi, mcdf, mctf, di, counting_lines, show_counts):
         self.frame = initial_frame # current frame of video
         self.detector = detector
         self.tracker = tracker
@@ -29,6 +28,7 @@ class VehicleCounter():
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
         self.counts = {counting_line['label']: {} for counting_line in counting_lines} # counts of vehicles by type for each counting line
+        self.show_counts = show_counts
 
         # create blobs from initial frame
         droi_frame = get_roi_frame(self.frame, self.droi)
@@ -61,6 +61,7 @@ class VehicleCounter():
             # rerun detection
             droi_frame = get_roi_frame(self.frame, self.droi)
             _bounding_boxes, _classes, _confidences = get_bounding_boxes(droi_frame, self.detector)
+
             self.blobs = add_new_blobs(_bounding_boxes, _classes, _confidences, self.blobs, self.frame, self.tracker, self.mcdf)
             self.blobs = remove_duplicates(self.blobs)
             self.frame_count = 0
@@ -90,5 +91,15 @@ class VehicleCounter():
         # show detection roi
         if self.show_droi:
             frame = draw_roi(frame, self.droi)
+
+        # show counts
+        if self.show_counts:
+            offset = 1
+            for line, objects in self.counts.items():
+                cv2.putText(frame, line, (10, 40 * offset), font, 1, (255, 0, 0), 2, line_type)
+                for label, count in objects.items():
+                    offset += 1
+                    cv2.putText(frame, "{}: {}".format(label, count), (10, 40 * offset), font, 1, (255, 0, 0), 2, line_type)
+                offset += 2
 
         return frame

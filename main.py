@@ -9,9 +9,7 @@ def run():
 
     import ast
     import os
-    import sys
     import time
-
     import cv2
 
     from util.image import take_screenshot
@@ -42,9 +40,10 @@ def run():
             else [(0, 0), (f_width, 0), (f_width, f_height), (0, f_height)]
     show_droi = ast.literal_eval(os.getenv('SHOW_DROI'))
     counting_lines = ast.literal_eval(os.getenv('COUNTING_LINES'))
+    show_counts = ast.literal_eval(os.getenv('SHOW_COUNTS'))
 
     vehicle_counter = VehicleCounter(frame, detector, tracker, droi, show_droi, mcdf,
-                                     mctf, detection_interval, counting_lines)
+                                     mctf, detection_interval, counting_lines, show_counts)
 
     record = ast.literal_eval(os.getenv('RECORD'))
     headless = ast.literal_eval(os.getenv('HEADLESS'))
