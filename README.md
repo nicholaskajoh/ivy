@@ -30,5 +30,8 @@ By default, Ivy runs in "debug mode" which provides you a window to monitor the 
 - press the `q` key to quit the program
 - click any point on the window to log the coordinates of the pixel in that position
 
+## Community
+Got questions, contributions, suggestions, concerns? [Join our community on Spectrum](https://spectrum.chat/ivy)!
+
 ## Donate
 Love this project? You can [buy me a coffee or two](http://buymeacoff.ee/nicholaskajoh) to support its continued development. 😊
