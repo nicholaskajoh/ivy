@@ -7,11 +7,10 @@ def run():
     Initialize counter class and run counting loop.
     '''
 
-    import ast
-    import os
     import time
     import cv2
 
+    import settings
     from util.image import take_screenshot
     from util.logger import get_logger
     from util.debugger import mouse_callback
@@ -20,37 +19,37 @@ def run():
     logger = get_logger()
 
     # capture traffic scene video
-    is_cam = ast.literal_eval(os.getenv('IS_CAM'))
-    video = int(os.getenv('VIDEO')) if is_cam else os.getenv('VIDEO')
+    is_cam = settings.IS_CAM
+    video = settings.VIDEO
     cap = cv2.VideoCapture(video)
     if not cap.isOpened():
         raise Exception('Invalid video source {0}'.format(video))
     ret, frame = cap.read()
     f_height, f_width, _ = frame.shape
 
-    detection_interval = int(os.getenv('DI'))
-    mcdf = int(os.getenv('MCDF'))
-    mctf = int(os.getenv('MCTF'))
-    detector = os.getenv('DETECTOR')
-    tracker = os.getenv('TRACKER')
+    detection_interval = settings.DI
+    mcdf = settings.MCDF
+    mctf = settings.MCTF
+    detector = settings.DETECTOR
+    tracker = settings.TRACKER
     # create detection region of interest polygon
-    use_droi = ast.literal_eval(os.getenv('USE_DROI'))
-    droi = ast.literal_eval(os.getenv('DROI')) \
+    use_droi = settings.USE_DROI
+    droi = settings.DROI \
             if use_droi \
             else [(0, 0), (f_width, 0), (f_width, f_height), (0, f_height)]
-    show_droi = ast.literal_eval(os.getenv('SHOW_DROI'))
-    counting_lines = ast.literal_eval(os.getenv('COUNTING_LINES'))
-    show_counts = ast.literal_eval(os.getenv('SHOW_COUNTS'))
+    show_droi = settings.SHOW_DROI
+    counting_lines = settings.COUNTING_LINES
+    show_counts = settings.SHOW_COUNTS
 
     vehicle_counter = VehicleCounter(frame, detector, tracker, droi, show_droi, mcdf,
                                      mctf, detection_interval, counting_lines, show_counts)
 
-    record = ast.literal_eval(os.getenv('RECORD'))
-    headless = ast.literal_eval(os.getenv('HEADLESS'))
+    record = settings.RECORD
+    headless = settings.HEADLESS
 
     if record:
         # initialize video object to record counting
-        output_video = cv2.VideoWriter(os.getenv('OUTPUT_VIDEO_PATH'), \
+        output_video = cv2.VideoWriter(settings.OUTPUT_VIDEO_PATH, \
                                         cv2.VideoWriter_fourcc(*'MJPG'), \
                                         30, \
                                         (f_width, f_height))
@@ -106,7 +105,7 @@ def run():
                 output_video.write(output_frame)
 
             if not headless:
-                debug_window_size = ast.literal_eval(os.getenv('DEBUG_WINDOW_SIZE'))
+                debug_window_size = settings.DEBUG_WINDOW_SIZE
                 resized_frame = cv2.resize(output_frame, debug_window_size)
                 cv2.imshow('Debug', resized_frame)
 

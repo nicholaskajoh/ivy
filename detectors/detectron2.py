@@ -3,37 +3,36 @@ Performs detection using models created with FAIRs Detectron2 Framework.
 https://github.com/facebookresearch/detectron2
 '''
 
-import os
 import torch
 from detectron2.utils.logger import setup_logger
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
+import settings
+from util.logger import get_logger
 
 
 setup_logger()
+logger = get_logger()
 
-with open(os.getenv('DETECTRON2_CLASSES_PATH'), 'r') as classes_file:
+with open(settings.DETECTRON2_CLASSES_PATH, 'r') as classes_file:
     CLASSES = dict(enumerate([line.strip() for line in classes_file.readlines()]))
-with open(os.getenv('DETECTRON2_CLASSES_OF_INTEREST_PATH'), 'r') as coi_file:
+with open(settings.DETECTRON2_CLASSES_OF_INTEREST_PATH, 'r') as coi_file:
     CLASSES_OF_INTEREST = tuple([line.strip() for line in coi_file.readlines()])
 
 # initialize model with weights and config
 cfg = get_cfg()
-cfg.merge_from_file(os.getenv('DETECTRON2_CONFIG_PATH'))
-cfg.MODEL.WEIGHTS = os.getenv('DETECTRON2_WEIGHTS_PATH')
-cfg.MODEL.ROI_HEADS.NUM_CLASSES = int(os.getenv('DETECTRON2_NUM_CLASSES'))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = float(os.getenv('DETECTRON2_CONFIDENCE_THRESHOLD'))
+cfg.merge_from_file(settings.DETECTRON2_CONFIG_PATH)
+cfg.MODEL.WEIGHTS = settings.DETECTRON2_WEIGHTS_PATH
+cfg.MODEL.ROI_HEADS.NUM_CLASSES = int(settings.DETECTRON2_NUM_CLASSES)
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = float(settings.DETECTRON2_CONFIDENCE_THRESHOLD)
 cfg.DATALOADER.NUM_WORKERS = 2
 
-from util.logger import get_logger
-logger = get_logger()
-
-if not torch.cuda.is_available():
+if torch.cuda.is_available():
+    logger.debug('GPU available, using GPU')
+    cfg.MODEL.DEVICE = 'cuda'
+else:
     logger.debug('No GPU available, using CPU')
     cfg.MODEL.DEVICE = 'cpu'
-else:
-    logger.debug('GPU Available, using GPU')
-    cfg.MODEL.DEVICE = 'cuda'
 
 predictor = DefaultPredictor(cfg)
 
@@ -64,8 +63,8 @@ def get_bounding_boxes(image):
     '''
     try:
         outputs = predictor(image)
-    except Exception as e:
-        print(e)
+    except Exception as error:
+        logger.error(error)
 
     _classes = []
     _confidences = []

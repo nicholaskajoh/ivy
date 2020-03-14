@@ -6,25 +6,26 @@ https://pjreddie.com/darknet/yolo/
 import ast
 import os
 import cv2
+import settings
 
 
-with open(os.getenv('YOLO_CLASSES_PATH'), 'r') as classes_file:
+with open(settings.YOLO_CLASSES_PATH, 'r') as classes_file:
     CLASSES = dict(enumerate([line.strip() for line in classes_file.readlines()]))
-with open(os.getenv('YOLO_CLASSES_OF_INTEREST_PATH'), 'r') as coi_file:
+with open(settings.YOLO_CLASSES_OF_INTEREST_PATH, 'r') as coi_file:
     CLASSES_OF_INTEREST = tuple([line.strip() for line in coi_file.readlines()])
 
-use_gpu = ast.literal_eval(os.getenv('ENABLE_GPU_ACCELERATION'))
-conf_threshold = float(os.getenv('YOLO_CONFIDENCE_THRESHOLD'))
+use_gpu = ast.literal_eval(os.getenv('ENABLE_GPU_ACCELERATION', 'False'))
+conf_threshold = settings.YOLO_CONFIDENCE_THRESHOLD
 
 # initialize model with weights and config
 if use_gpu:
     from pydarknet import Detector
-    net = Detector(bytes(os.getenv('YOLO_CONFIG_PATH'), encoding='utf-8'),
-                   bytes(os.getenv('YOLO_WEIGHTS_PATH'), encoding='utf-8'),
+    net = Detector(bytes(settings.YOLO_CONFIG_PATH, encoding='utf-8'),
+                   bytes(settings.YOLO_WEIGHTS_PATH, encoding='utf-8'),
                    0,
-                   bytes(os.getenv('YOLO_DATA_PATH'), encoding='utf-8'))
+                   bytes(settings.YOLO_DATA_PATH, encoding='utf-8'))
 else:
-    net = cv2.dnn.readNet(os.getenv('YOLO_WEIGHTS_PATH'), os.getenv('YOLO_CONFIG_PATH'))
+    net = cv2.dnn.readNet(settings.YOLO_WEIGHTS_PATH, settings.YOLO_CONFIG_PATH)
 
 def get_bounding_boxes_cpu(image):
     import numpy as np
@@ -93,7 +94,7 @@ def get_bounding_boxes(image):
     Return a list of bounding boxes of vehicles detected,
     their classes and the confidences of the detections made.
     '''
-    
+
     if use_gpu:
         return get_bounding_boxes_gpu(image)
     else:

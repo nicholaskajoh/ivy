@@ -3,11 +3,11 @@ VCS logger.
 '''
 
 import os
-import ast
 import logging
 import pathlib
 from pythonjsonlogger import jsonlogger
 
+import settings
 from .job import get_job_id
 
 
@@ -41,7 +41,7 @@ def init_logger():
     logger.addFilter(MetaFilter())
     logger.setLevel(logging.DEBUG)
 
-    enable_console_logger = ast.literal_eval(os.getenv('ENABLE_CONSOLE_LOGGER', 'True'))
+    enable_console_logger = settings.ENABLE_CONSOLE_LOGGER
     if enable_console_logger:
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.INFO) # https://docs.python.org/3/library/logging.html#logging-levels
@@ -49,9 +49,9 @@ def init_logger():
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
-    enable_file_logger = ast.literal_eval(os.getenv('ENABLE_FILE_LOGGER', 'True'))
+    enable_file_logger = settings.ENABLE_FILE_LOGGER
     if enable_file_logger:
-        log_files_directory = os.getenv('LOG_FILES_DIRECTORY')
+        log_files_directory = settings.LOG_FILES_DIRECTORY
         pathlib.Path(log_files_directory).mkdir(parents=True, exist_ok=True)
         file_path = os.path.join(log_files_directory, job_id + '.log')
         file_handler = logging.FileHandler(file_path)
@@ -60,7 +60,7 @@ def init_logger():
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
 
-    enable_logstash_logger = ast.literal_eval(os.getenv('ENABLE_LOGSTASH_LOGGER', 'False'))
+    enable_logstash_logger = settings.ENABLE_LOGSTASH_LOGGER
     if enable_logstash_logger:
         pass
 

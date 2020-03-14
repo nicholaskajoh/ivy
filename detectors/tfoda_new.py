@@ -1,18 +1,18 @@
-"""
+'''
 Perform detection using models created with the Tensorflow Object Detection API.
 https://github.com/tensorflow/models/tree/master/research/object_detection
 This class uses tensorflow to load and run the models, as opposed to tfoda.py
 which uses OpenCV to load and run the TF models.
-"""
+'''
 
-import os
 import numpy as np
 import tensorflow as tf
+import settings
 
 
-with open(os.getenv('TFODA_CLASSES_PATH'), 'r') as classes_file:
+with open(settings.TFODA_CLASSES_PATH, 'r') as classes_file:
     CLASSES = dict(enumerate([line.strip() for line in classes_file.readlines()]))
-with open(os.getenv('TFODA_CLASSES_OF_INTEREST_PATH'), 'r') as coi_file:
+with open(settings.TFODA_CLASSES_OF_INTEREST_PATH, 'r') as coi_file:
     CLASSES_OF_INTEREST = tuple([line.strip() for line in coi_file.readlines()])
 
 def scale_box_coords(box, img_w, img_h):
@@ -24,8 +24,8 @@ def scale_box_coords(box, img_w, img_h):
         (box[2] - box[0]) * img_h, # height
     ]
 
-confidence_threshold = float(os.getenv('TFODA_CONFIDENCE_THRESHOLD'))
-model_dir = os.getenv('TFODA_MODEL_DIR')
+confidence_threshold = float(settings.TFODA_CONFIDENCE_THRESHOLD)
+model_dir = settings.TFODA_MODEL_DIR
 
 model = tf.saved_model.load(str(model_dir))
 model = model.signatures['serving_default']
