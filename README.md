@@ -12,7 +12,7 @@ Ivy is an open source video-based vehicle counting system which employs several 
 - Run `pip install -r requirements.txt` to install dependencies.
 
 ## Run
-- Create _.env_ from _.env.example_ in the project root and edit as appropriate.
+- Create a _.env_ file (based on _.env.example_) in the project's root directory and edit as appropriate.
 - Run `python -m  main`.
 
 ## Demo
