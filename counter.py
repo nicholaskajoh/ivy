@@ -1,3 +1,5 @@
+# pylint: disable=missing-module-docstring,invalid-name
+
 import time
 from util.logger import get_logger
 
@@ -88,7 +90,6 @@ def attempt_count(blob, blob_id, counting_lines, counts):
                     'position_first_detected': blob.position_first_detected,
                     'position_counted': blob.centroid,
                     'counted_at':time.time(),
-                    'counts': counts,
                 },
             })
     return blob, counts

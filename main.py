@@ -138,7 +138,7 @@ def run():
         cv2.destroyAllWindows()
     if record:
         output_video.release()
-    logger.info('Processing ended.', extra={'meta': {'label': 'END_PROCESS'}})
+    logger.info('Processing ended.', extra={'meta': {'label': 'END_PROCESS', 'counts': vehicle_counter.counts}})
 
 
 if __name__ == '__main__':

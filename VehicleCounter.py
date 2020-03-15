@@ -1,6 +1,12 @@
+'''
+Vehicle Counter class.
+'''
+
+# pylint: disable=missing-class-docstring,missing-function-docstring,invalid-name
+
+import multiprocessing
 import cv2
 from joblib import Parallel, delayed
-import multiprocessing
 
 from tracker import add_new_blobs, remove_duplicates, update_blob_tracker
 from detectors.detector import get_bounding_boxes
@@ -9,7 +15,7 @@ from util.logger import get_logger
 from counter import attempt_count
 
 logger = get_logger()
-num_cores = multiprocessing.cpu_count()
+NUM_CORES = multiprocessing.cpu_count()
 
 class VehicleCounter():
 
@@ -21,7 +27,7 @@ class VehicleCounter():
         self.show_droi = show_droi
         self.mcdf = mcdf # maximum consecutive detection failures
         self.mctf = mctf # maximum consecutive tracking failures
-        self.di = di # detection interval
+        self.detection_interval = di
         self.counting_lines = counting_lines
 
         self.blobs = {}
@@ -43,7 +49,7 @@ class VehicleCounter():
 
         blobs_list = list(self.blobs.items())
         # update blob trackers
-        blobs_list = Parallel(n_jobs=num_cores, prefer='threads')(
+        blobs_list = Parallel(n_jobs=NUM_CORES, prefer='threads')(
             delayed(update_blob_tracker)(blob, blob_id, self.frame) for blob_id, blob in blobs_list
         )
         self.blobs = dict(blobs_list)
@@ -57,7 +63,7 @@ class VehicleCounter():
             if blob.num_consecutive_tracking_failures >= self.mctf:
                 del self.blobs[blob_id]
 
-        if self.frame_count >= self.di:
+        if self.frame_count >= self.detection_interval:
             # rerun detection
             droi_frame = get_roi_frame(self.frame, self.droi)
             _bounding_boxes, _classes, _confidences = get_bounding_boxes(droi_frame, self.detector)
