@@ -1,7 +1,9 @@
 '''
-Performs detection using models created with FAIRs Detectron2 Framework.
+Perform detection using models created with FAIR's Detectron2 framework.
 https://github.com/facebookresearch/detectron2
 '''
+
+# pylint: disable=import-error,no-name-in-module,invalid-name,broad-except
 
 import torch
 from detectron2.utils.logger import setup_logger

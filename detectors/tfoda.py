@@ -1,56 +1,68 @@
-"""
+'''
 Perform detection using models created with the Tensorflow Object Detection API.
 https://github.com/tensorflow/models/tree/master/research/object_detection
-"""
+'''
 
-import cv2
+# pylint: disable=missing-function-docstring,invalid-name
+
 import numpy as np
+import tensorflow as tf
 import settings
 
 
 with open(settings.TFODA_CLASSES_PATH, 'r') as classes_file:
-    classes = dict(enumerate([line.strip() for line in classes_file.readlines()]))
+    CLASSES = dict(enumerate([line.strip() for line in classes_file.readlines()]))
 with open(settings.TFODA_CLASSES_OF_INTEREST_PATH, 'r') as coi_file:
-    classes_of_interest = tuple([line.strip() for line in coi_file.readlines()])
+    CLASSES_OF_INTEREST = tuple([line.strip() for line in coi_file.readlines()])
+
+def scale_box_coords(box, img_w, img_h):
+    # The box is in normalised order [ymin, xmin, ymax, xmax]
+    return [
+        box[1] * img_w, # xmin
+        box[0] * img_h, # ymin
+        (box[3] - box[1]) * img_w, # width
+        (box[2] - box[0]) * img_h, # height
+    ]
+
+confidence_threshold = float(settings.TFODA_CONFIDENCE_THRESHOLD)
+model_dir = settings.TFODA_MODEL_DIR
+
+model = tf.saved_model.load(str(model_dir))
+model = model.signatures['serving_default']
 
 def get_bounding_boxes(image):
-    # create model using weights and config
-    net = cv2.dnn.readNetFromTensorflow(settings.TFODA_WEIGHTS_PATH, settings.TFODA_CONFIG_PATH)
+    image = image[:, :, ::-1]
+    img_h, img_w, _ = image.shape
 
-    # create image blob
-    blob = cv2.dnn.blobFromImage(image, size=(300, 300), swapRB=True, crop=False)
+    # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
+    input_tensor = tf.convert_to_tensor(image)
+    # The model expects a batch of images, so add an axis with `tf.newaxis`.
+    input_tensor = input_tensor[tf.newaxis, ...]
 
-    # detect objects
-    net.setInput(blob)
-    detections = net.forward()
+    # Run inference
+    output_dict = model(input_tensor)
+    # All outputs are batches tensors.
+    # Convert to numpy arrays, and take index [0] to remove the batch dimension.
+    # We're only interested in the first num_detections.
+    num_detections = int(output_dict.pop('num_detections'))
+    output_dict = {key:value[0, :num_detections].numpy()
+                   for key, value in output_dict.items()}
+    output_dict['num_detections'] = num_detections
 
-    # get bounding boxes
-    confidence_threshold = float(settings.TFODA_CONFIDENCE_THRESHOLD)
-    boxes = []
+    # detection_classes should be ints.
+    output_dict['detection_classes'] = output_dict['detection_classes'].astype(np.int64)
+
     _classes = []
     _confidences = []
-    rows, cols, _ = image.shape
-    for detection in detections[0, 0]:
-        confidence = float(detection[2])
-        class_id = int(detection[1])
-        if confidence > confidence_threshold and class_id in classes and classes[class_id] in classes_of_interest:
-            left = int(detection[3] * cols)
-            top = int(detection[4] * rows)
-            right = int(detection[5] * cols)
-            bottom = int(detection[6] * rows)
-
-            x, y, w, h = left, top, right - left, bottom - top
-            boxes.append([x, y, w, h])
-            _classes.append(classes[class_id])
-            _confidences.append(confidence)
-
-    # remove overlapping bounding boxes
-    nms_threshold = 0.4
-    indices = cv2.dnn.NMSBoxes(boxes, _confidences, confidence_threshold, nms_threshold)
-
     _bounding_boxes = []
-    for i in indices:
-        i = i[0]
-        _bounding_boxes.append(boxes[i])
+
+    for i, class_id in enumerate(output_dict['detection_classes']):
+        confidence = output_dict['detection_scores'][i]
+        _class = CLASSES[class_id]
+        if confidence > confidence_threshold and _class in CLASSES_OF_INTEREST:
+            _box = scale_box_coords(output_dict['detection_boxes'][i], img_w, img_h)
+            _classes.append(_class)
+            _confidences.append(confidence)
+            _bounding_boxes.append(_box)
 
     return _bounding_boxes, _classes, _confidences

@@ -2,21 +2,29 @@
 VCS entry point.
 '''
 
+# pylint: disable=wrong-import-position
+
+import time
+import cv2
+
+from dotenv import load_dotenv
+load_dotenv()
+
+import settings
+from util.logger import init_logger
+from util.image import take_screenshot
+from util.logger import get_logger
+from util.debugger import mouse_callback
+from VehicleCounter import VehicleCounter
+
+init_logger()
+logger = get_logger()
+
+
 def run():
     '''
     Initialize counter class and run counting loop.
     '''
-
-    import time
-    import cv2
-
-    import settings
-    from util.image import take_screenshot
-    from util.logger import get_logger
-    from util.debugger import mouse_callback
-    from VehicleCounter import VehicleCounter
-
-    logger = get_logger()
 
     # capture traffic scene video
     is_cam = settings.IS_CAM
@@ -134,10 +142,4 @@ def run():
 
 
 if __name__ == '__main__':
-    from dotenv import load_dotenv
-    load_dotenv()
-
-    from util.logger import init_logger
-    init_logger()
-
     run()

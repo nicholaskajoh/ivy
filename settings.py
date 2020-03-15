@@ -148,17 +148,15 @@ if DETECTOR == 'yolo':
             os.getenv('YOLO_CONFIG_PATH') and \
             os.getenv('YOLO_CLASSES_PATH') and \
             os.getenv('YOLO_CLASSES_OF_INTEREST_PATH') and \
-            os.getenv('YOLO_DATA_PATH') and \
             os.getenv('YOLO_CONFIDENCE_THRESHOLD'):
         YOLO_WEIGHTS_PATH = os.getenv('YOLO_WEIGHTS_PATH')
         YOLO_CONFIG_PATH = os.getenv('YOLO_CONFIG_PATH')
         YOLO_CLASSES_PATH = os.getenv('YOLO_CLASSES_PATH')
         YOLO_CLASSES_OF_INTEREST_PATH = os.getenv('YOLO_CLASSES_OF_INTEREST_PATH')
-        YOLO_DATA_PATH = os.getenv('YOLO_DATA_PATH')
         YOLO_CONFIDENCE_THRESHOLD = float(os.getenv('YOLO_CONFIDENCE_THRESHOLD'))
     else:
         print('YOLO_WEIGHTS_PATH, YOLO_CONFIG_PATH, YOLO_CLASSES_PATH, YOLO_CLASSES_OF_INTEREST_PATH, ' +
-              'YOLO_DATA_PATH and/or YOLO_CONFIDENCE_THRESHOLD not set or invalid.')
+              'and/or YOLO_CONFIDENCE_THRESHOLD not set or invalid.')
         ENVS_READY = False
 
 # Configs for Detectron2 detector

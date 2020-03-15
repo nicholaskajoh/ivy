@@ -1,11 +1,12 @@
 '''
-Performs vehicle detection using models created with the YOLO (You Only Look Once) neural net.
+Perform vehicle detection using models created with the YOLO (You Only Look Once) neural net.
 https://pjreddie.com/darknet/yolo/
 '''
 
-import ast
-import os
+# pylint: disable=no-member,invalid-name
+
 import cv2
+import numpy as np
 import settings
 
 
@@ -13,22 +14,14 @@ with open(settings.YOLO_CLASSES_PATH, 'r') as classes_file:
     CLASSES = dict(enumerate([line.strip() for line in classes_file.readlines()]))
 with open(settings.YOLO_CLASSES_OF_INTEREST_PATH, 'r') as coi_file:
     CLASSES_OF_INTEREST = tuple([line.strip() for line in coi_file.readlines()])
-
-use_gpu = ast.literal_eval(os.getenv('ENABLE_GPU_ACCELERATION', 'False'))
 conf_threshold = settings.YOLO_CONFIDENCE_THRESHOLD
+net = cv2.dnn.readNet(settings.YOLO_WEIGHTS_PATH, settings.YOLO_CONFIG_PATH)
 
-# initialize model with weights and config
-if use_gpu:
-    from pydarknet import Detector
-    net = Detector(bytes(settings.YOLO_CONFIG_PATH, encoding='utf-8'),
-                   bytes(settings.YOLO_WEIGHTS_PATH, encoding='utf-8'),
-                   0,
-                   bytes(settings.YOLO_DATA_PATH, encoding='utf-8'))
-else:
-    net = cv2.dnn.readNet(settings.YOLO_WEIGHTS_PATH, settings.YOLO_CONFIG_PATH)
-
-def get_bounding_boxes_cpu(image):
-    import numpy as np
+def get_bounding_boxes(image):
+    '''
+    Return a list of bounding boxes of vehicles detected,
+    their classes and the confidences of the detections made.
+    '''
 
     # create image blob
     scale = 0.00392
@@ -72,30 +65,3 @@ def get_bounding_boxes_cpu(image):
         _bounding_boxes.append(boxes[i])
 
     return _bounding_boxes, _classes, _confidences
-
-def get_bounding_boxes_gpu(img):
-    from pydarknet import Image
-
-    img_darknet = Image(img)
-    results = net.detect(img_darknet)
-
-    _bounding_boxes, _classes, _confidences = [], [], []
-    for cat, score, bounds in results:
-        _class = str(cat.decode('utf-8'))
-        if score > conf_threshold and _class in CLASSES_OF_INTEREST:
-            _bounding_boxes.append(bounds)
-            _classes.append(_class)
-            _confidences.append(score)
-
-    return _bounding_boxes, _classes, _confidences
-
-def get_bounding_boxes(image):
-    '''
-    Return a list of bounding boxes of vehicles detected,
-    their classes and the confidences of the detections made.
-    '''
-
-    if use_gpu:
-        return get_bounding_boxes_gpu(image)
-    else:
-        return get_bounding_boxes_cpu(image)
