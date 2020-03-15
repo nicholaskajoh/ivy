@@ -3,8 +3,9 @@ Functions for keeping track of detected vehicles in a video.
 '''
 
 import cv2
+import settings
 from util.blob import Blob
-from util.bounding_box import get_centroid, get_overlap, get_box_image
+from util.bounding_box import get_overlap, get_box_image
 from util.image import get_base64_image
 from util.vehicle_info import generate_vehicle_id
 from util.logger import get_logger
@@ -69,16 +70,16 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
                     matched_blob_ids.append(_id)
                 blob.update(box, _type, _confidence, _tracker)
 
-                logger.debug('Blob updated.', extra={
-                    'meta': {
-                        'label': 'BLOB_UPDATE',
-                        'vehicle_id': _id,
-                        'bounding_box': blob.bounding_box,
-                        'type': blob.type,
-                        'type_confidence': blob.type_confidence,
-                        'image': get_base64_image(get_box_image(frame, blob.bounding_box)),
-                    },
-                })
+                blob_update_log_meta = {
+                    'label': 'BLOB_UPDATE',
+                    'vehicle_id': _id,
+                    'bounding_box': blob.bounding_box,
+                    'type': blob.type,
+                    'type_confidence': blob.type_confidence,
+                }
+                if settings.LOG_IMAGES:
+                    blob_update_log_meta['image'] = get_base64_image(get_box_image(frame, blob.bounding_box))
+                logger.debug('Blob updated.', extra={'meta': blob_update_log_meta})
                 break
 
         if not match_found:
@@ -86,16 +87,16 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
             blob_id = generate_vehicle_id()
             blobs[blob_id] = _blob
 
-            logger.debug('Blob created.', extra={
-                'meta': {
-                    'label': 'BLOB_CREATE',
-                    'vehicle_id': blob_id,
-                    'bounding_box': _blob.bounding_box,
-                    'type': _blob.type,
-                    'type_confidence': _blob.type_confidence,
-                    'image': get_base64_image(get_box_image(frame, _blob.bounding_box)),
-                },
-            })
+            blog_create_log_meta = {
+                'label': 'BLOB_CREATE',
+                'vehicle_id': blob_id,
+                'bounding_box': _blob.bounding_box,
+                'type': _blob.type,
+                'type_confidence': _blob.type_confidence,
+            }
+            if settings.LOG_IMAGES:
+                blog_create_log_meta['image'] = get_base64_image(get_box_image(frame, _blob.bounding_box))
+            logger.debug('Blob created.', extra={'meta': blog_create_log_meta})
 
     blobs = _remove_stray_blobs(blobs, matched_blob_ids, mcdf)
     return blobs

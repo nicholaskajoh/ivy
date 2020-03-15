@@ -192,6 +192,16 @@ except ValueError:
 if ENABLE_FILE_LOGGER:
     LOG_FILES_DIRECTORY = os.getenv('LOG_FILES_DIRECTORY', './data/logs/')
 
+# Log base 64 images
+# Logging images will increase the size of your logs significantly
+# However, if you intend to do some post-processing that involves images,
+# you might want to have it on
+try:
+    LOG_IMAGES = ast.literal_eval(os.getenv('LOG_IMAGES', 'False'))
+except ValueError:
+    print('Invalid value for LOG_IMAGES. It should be either True or False.')
+    ENVS_READY = False
+
 # Size of window used to view the vehicle counting process
 try:
     DEBUG_WINDOW_SIZE = ast.literal_eval(os.getenv('DEBUG_WINDOW_SIZE', '(858, 480)'))
