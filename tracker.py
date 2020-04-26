@@ -2,6 +2,7 @@
 Functions for keeping track of detected vehicles in a video.
 '''
 
+import sys
 import cv2
 import settings
 from util.blob import Blob
@@ -38,7 +39,10 @@ def get_tracker(algorithm, bounding_box, frame):
     if algorithm == 'kcf':
         return _kcf_create(bounding_box, frame)
 
-    raise Exception('Invalid tracking algorithm specified (options: csrt, kcf)')
+    logger.error('Invalid tracking algorithm specified (options: csrt, kcf)', extra={
+        'meta': {'label': 'INVALID_TRACKING_ALGORITHM'},
+    })
+    sys.exit()
 
 def _remove_stray_blobs(blobs, matched_blob_ids, mcdf):
     '''

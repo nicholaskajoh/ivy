@@ -41,6 +41,9 @@ class VehicleCounter():
         _bounding_boxes, _classes, _confidences = get_bounding_boxes(droi_frame, self.detector)
         self.blobs = add_new_blobs(_bounding_boxes, _classes, _confidences, self.blobs, self.frame, self.tracker, self.mcdf)
 
+    def get_counts(self):
+        return self.counts
+
     def get_blobs(self):
         return self.blobs
 

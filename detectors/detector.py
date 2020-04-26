@@ -4,6 +4,11 @@ Detectors entry point.
 
 # pylint: disable=import-outside-toplevel
 
+import sys
+from util.logger import get_logger
+
+
+logger = get_logger()
 
 def get_bounding_boxes(frame, model):
     '''
@@ -18,6 +23,9 @@ def get_bounding_boxes(frame, model):
     elif model == 'detectron2':
         from detectors.detectron2 import get_bounding_boxes as gbb
     else:
-        raise Exception('Invalid detector model, algorithm or API specified (options: yolo, tfoda, detectron2, haarcascade)')
+        logger.error('Invalid detector model, algorithm or API specified (options: yolo, tfoda, detectron2, haarcascade)', extra={
+            'meta': {'label': 'INVALID_DETECTION_ALGORITHM'},
+        })
+        sys.exit()
 
     return gbb(frame)
