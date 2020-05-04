@@ -27,7 +27,6 @@ def run():
     Initialize counter class and run counting loop.
     '''
 
-    is_cam = settings.IS_CAM
     video = settings.VIDEO
     cap = cv2.VideoCapture(video)
     if not cap.isOpened():
@@ -89,7 +88,7 @@ def run():
 
     try:
         # main loop
-        while is_cam or cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
+        while cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
             k = cv2.waitKey(1) & 0xFF
             if k == ord('p'): # pause/play loop if 'p' key is pressed
                 is_paused = False if is_paused else True

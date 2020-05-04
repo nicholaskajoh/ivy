@@ -60,10 +60,6 @@ def init_logger():
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
 
-    enable_logstash_logger = settings.ENABLE_LOGSTASH_LOGGER
-    if enable_logstash_logger:
-        pass
-
 def get_logger():
     '''
     Fetch logger.

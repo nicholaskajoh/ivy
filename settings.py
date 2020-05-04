@@ -8,19 +8,12 @@ import ast
 
 ENVS_READY = True
 
-# Specify if video capture is from a camera
-try:
-    IS_CAM = ast.literal_eval(os.getenv('IS_CAM', 'False'))
-except ValueError:
-    print('Invalid value for IS_CAM. It should be either True or False.')
-    ENVS_READY = False
-
-# Absolute/relative path to video or camera input
-# E.g "./data/videos/sample_traffic_scene.mp4" or 1
+# Absolute/relative path to video file
+# E.g ./data/videos/sample_traffic_scene.mp4
 if os.getenv('VIDEO'):
-    VIDEO = int(os.getenv('VIDEO')) if IS_CAM else os.getenv('VIDEO')
+    VIDEO = os.getenv('VIDEO')
 else:
-    print('Path to video or camera input not set.')
+    print('Path to video file not set.')
     ENVS_READY = False
 
 # Specify a detection Region of Interest (ROI)
@@ -110,10 +103,11 @@ except ValueError:
 # A counting line is represented by a label and line segment
 # E.g {'label': 'A', 'line': [(667, 713), (888, 713)]}
 if os.getenv('COUNTING_LINES'):
-    COUNTING_LINES = ast.literal_eval(os.getenv('COUNTING_LINES'))
-else:
-    print('Invalid value for COUNTING_LINES. It should be a list of lines.')
-    ENVS_READY = False
+    try:
+        COUNTING_LINES = ast.literal_eval(os.getenv('COUNTING_LINES'))
+    except ValueError:
+        print('Invalid value for COUNTING_LINES. It should be a list of lines.')
+        ENVS_READY = False
 
 # Configs for Haar Cascade detector
 if DETECTOR == 'haarcascade':
@@ -182,10 +176,9 @@ if DETECTOR == 'detectron2':
 try:
     ENABLE_CONSOLE_LOGGER = ast.literal_eval(os.getenv('ENABLE_CONSOLE_LOGGER', 'True'))
     ENABLE_FILE_LOGGER = ast.literal_eval(os.getenv('ENABLE_FILE_LOGGER', 'True'))
-    ENABLE_LOGSTASH_LOGGER = ast.literal_eval(os.getenv('ENABLE_LOGSTASH_LOGGER', 'False'))
 except ValueError:
-    print('Invalid value for ENABLE_CONSOLE_LOGGER, ENABLE_FILE_LOGGER ' +
-          'and/or ENABLE_LOGSTASH_LOGGER. They should be either True or False.')
+    print('Invalid value for ENABLE_CONSOLE_LOGGER and/or ' +
+          'ENABLE_FILE_LOGGER. They should be either True or False.')
     ENVS_READY = False
 
 # Absolute/relative path to log files directory
