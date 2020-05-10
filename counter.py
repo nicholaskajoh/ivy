@@ -81,9 +81,9 @@ def attempt_count(blob, blob_id, counting_lines, counts):
 
             blob.lines_crossed.append(label)
 
-            logger.info('Vehicle counted.', extra={
+            logger.info('Object counted.', extra={
                 'meta': {
-                    'label': 'VEHICLE_COUNT',
+                    'label': 'OBJECT_COUNT',
                     'id': blob_id,
                     'type': blob.type,
                     'counting_line': label,

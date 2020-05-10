@@ -1,10 +1,12 @@
 # Ivy
-Ivy is an open source video-based vehicle counting system which employs several computer vision techniques to detect, track and count vehicles in a traffic scene.
+Ivy is an open-source video-based object counting software for tallying pretty much anything (vehicles, people, animals — you name it).
 
-![](vehicle_counting.jpg)
+> Need help processing and analyzing your videos? [Try Traffic Logic](https://trafficlogic.co), our premium service.
+
+![](object_counting.jpg)
 
 ## Requirements
-- Python 3
+- Python 3 (tested with versions 3.5, 3.6 and 3.7)
 
 ## Setup
 - Clone this repo `git@github.com:nicholaskajoh/ivy.git`.
@@ -24,7 +26,7 @@ Ivy is an open source video-based vehicle counting system which employs several 
 - Run `python -m  main`.
 
 ## Demo
-Download [ivy_demo_data.zip](https://drive.google.com/open?id=1JtEhWlfk1CiUEFsrTQHQa0VkTi3IKbze) and unzip its contents in the [data directory](/data). It contains detection models and a sample video of a traffic scene.
+Download [ivy_demo_data.zip](https://drive.google.com/open?id=1JtEhWlfk1CiUEFsrTQHQa0VkTi3IKbze) and unzip its contents in the [data directory](/data). It contains detection models and a sample video.
 
 ## Test
 ```
@@ -32,14 +34,11 @@ python -m pytest
 ```
 
 ## Debug
-By default, Ivy runs in "debug mode" which provides you a window to monitor the vehicle counting process. You can:
+By default, Ivy runs in "debug mode" which provides you a window to monitor the object counting process. You can:
 - press the `p` key to pause/play the counting process
 - press the `s` key to capture a screenshot
 - press the `q` key to quit the program
 - click any point on the window to log the coordinates of the pixel in that position
 
 ## Community
-Got questions, contributions, suggestions, concerns? [Join our community on Spectrum](https://spectrum.chat/ivy)!
-
-## Donate
-Love this project? You can [buy me a coffee or two](http://buymeacoff.ee/nicholaskajoh) to support its continued development. 😊
+Got questions, contributions, suggestions, concerns? [Join our community on Spectrum](https://spectrum.chat/ivy)! Also follow us on Twitter [@CountWithIvy](https://twitter.com/CountWithIvy) to get notified about new features, fixes and initiatives.

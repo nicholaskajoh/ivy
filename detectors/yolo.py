@@ -1,5 +1,5 @@
 '''
-Perform vehicle detection using models created with the YOLO (You Only Look Once) neural net.
+Perform object detection using models created with the YOLO (You Only Look Once) neural net.
 https://pjreddie.com/darknet/yolo/
 '''
 
@@ -19,7 +19,7 @@ net = cv2.dnn.readNet(settings.YOLO_WEIGHTS_PATH, settings.YOLO_CONFIG_PATH)
 
 def get_bounding_boxes(image):
     '''
-    Return a list of bounding boxes of vehicles detected,
+    Return a list of bounding boxes of objects detected,
     their classes and the confidences of the detections made.
     '''
 

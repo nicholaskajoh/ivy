@@ -64,20 +64,20 @@ except ValueError:
     ENVS_READY = False
 
 # Detection interval i.e number of frames before detection is carried out again
-# (in order to find new vehicles and update the trackers of old ones)
+# (in order to find new objects and update the trackers of old ones)
 try:
     DI = int(os.getenv('DI', '10'))
 except ValueError:
     print('Invalid value for DI. It should be a positive integer.')
     ENVS_READY = False
 
-# Model/algorithm to use for vehicle detection (options: yolo, tfoda, detectron2, haarcascade)
+# Model/algorithm to use for object detection (options: yolo, tfoda, detectron2, haarcascade)
 DETECTOR = os.getenv('DETECTOR', 'yolo')
 
-# Algorithm to use for vehicle tracking (options: kcf, csrt)
+# Algorithm to use for object tracking (options: kcf, csrt)
 TRACKER = os.getenv('TRACKER', 'kcf')
 
-# Record vehicle counting as video
+# Record object counting as video
 try:
     RECORD = ast.literal_eval(os.getenv('RECORD', 'False'))
 except ValueError:
@@ -195,7 +195,7 @@ except ValueError:
     print('Invalid value for LOG_IMAGES. It should be either True or False.')
     ENVS_READY = False
 
-# Size of window used to view the vehicle counting process
+# Size of window used to view the object counting process
 try:
     DEBUG_WINDOW_SIZE = ast.literal_eval(os.getenv('DEBUG_WINDOW_SIZE', '(858, 480)'))
 except ValueError:

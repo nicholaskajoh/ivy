@@ -1,5 +1,5 @@
 '''
-Functions for keeping track of detected vehicles in a video.
+Functions for keeping track of detected objects in a video.
 '''
 
 import sys
@@ -8,7 +8,7 @@ import settings
 from util.blob import Blob
 from util.bounding_box import get_overlap, get_box_image
 from util.image import get_base64_image
-from util.vehicle_info import generate_vehicle_id
+from util.object_info import generate_object_id
 from util.logger import get_logger
 
 
@@ -76,7 +76,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
 
                 blob_update_log_meta = {
                     'label': 'BLOB_UPDATE',
-                    'vehicle_id': _id,
+                    'object_id': _id,
                     'bounding_box': blob.bounding_box,
                     'type': blob.type,
                     'type_confidence': blob.type_confidence,
@@ -88,12 +88,12 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
 
         if not match_found:
             _blob = Blob(box, _type, _confidence, _tracker)
-            blob_id = generate_vehicle_id()
+            blob_id = generate_object_id()
             blobs[blob_id] = _blob
 
             blog_create_log_meta = {
                 'label': 'BLOB_CREATE',
-                'vehicle_id': blob_id,
+                'object_id': blob_id,
                 'bounding_box': _blob.bounding_box,
                 'type': _blob.type,
                 'type_confidence': _blob.type_confidence,
@@ -107,7 +107,7 @@ def add_new_blobs(boxes, classes, confidences, blobs, frame, tracker, mcdf):
 
 def remove_duplicates(blobs):
     '''
-    Remove duplicate blobs i.e blobs that point to an already detected and tracked vehicle.
+    Remove duplicate blobs i.e blobs that point to an already detected and tracked object.
     '''
     for blob_id, blob_a in list(blobs.items()):
         for _, blob_b in list(blobs.items()):
@@ -126,10 +126,10 @@ def update_blob_tracker(blob, blob_id, frame):
     if success:
         blob.num_consecutive_tracking_failures = 0
         blob.update(box)
-        logger.debug('Vehicle tracker updated.', extra={
+        logger.debug('Object tracker updated.', extra={
             'meta': {
                 'label': 'TRACKER_UPDATE',
-                'vehicle_id': blob_id,
+                'object_id': blob_id,
                 'bounding_box': blob.bounding_box,
                 'centroid': blob.centroid,
             },

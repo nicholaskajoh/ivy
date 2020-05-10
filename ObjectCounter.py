@@ -1,5 +1,5 @@
 '''
-Vehicle Counter class.
+Object Counter class.
 '''
 
 # pylint: disable=missing-class-docstring,missing-function-docstring,invalid-name
@@ -17,7 +17,7 @@ from counter import attempt_count
 logger = get_logger()
 NUM_CORES = multiprocessing.cpu_count()
 
-class VehicleCounter():
+class ObjectCounter():
 
     def __init__(self, initial_frame, detector, tracker, droi, show_droi, mcdf, mctf, di, counting_lines, show_counts):
         self.frame = initial_frame # current frame of video
@@ -33,7 +33,7 @@ class VehicleCounter():
         self.blobs = {}
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
-        self.counts = {counting_line['label']: {} for counting_line in counting_lines} # counts of vehicles by type for each counting line
+        self.counts = {counting_line['label']: {} for counting_line in counting_lines} # counts of objects by type for each counting line
         self.show_counts = show_counts
 
         # create blobs from initial frame
@@ -58,7 +58,7 @@ class VehicleCounter():
         self.blobs = dict(blobs_list)
 
         for blob_id, blob in blobs_list:
-            # count vehicle if it has crossed a counting line
+            # count object if it has crossed a counting line
             blob, self.counts = attempt_count(blob, blob_id, self.counting_lines, self.counts)
             self.blobs[blob_id] = blob
 
@@ -86,10 +86,10 @@ class VehicleCounter():
         for _id, blob in self.blobs.items():
             (x, y, w, h) = [int(v) for v in blob.bounding_box]
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            vehicle_label = 'I: ' + _id[:8] \
+            object_label = 'I: ' + _id[:8] \
                             if blob.type is None \
                             else 'I: {0}, T: {1} ({2})'.format(_id[:8], blob.type, str(blob.type_confidence)[:4])
-            cv2.putText(frame, vehicle_label, (x, y - 5), font, 1, (255, 0, 0), 2, line_type)
+            cv2.putText(frame, object_label, (x, y - 5), font, 1, (255, 0, 0), 2, line_type)
 
         # draw counting lines
         for counting_line in self.counting_lines:

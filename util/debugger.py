@@ -1,5 +1,5 @@
 '''
-Utilities for configuring and debugging the vehicle count process.
+Utilities for configuring and debugging the object count process.
 '''
 
 import cv2
