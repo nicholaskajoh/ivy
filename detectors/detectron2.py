@@ -60,7 +60,7 @@ def convert_box_to_array(box):
 
 def get_bounding_boxes(image):
     '''
-    Return a list of bounding boxes of vehicles detected,
+    Return a list of bounding boxes of objects detected,
     their classes and the confidences of the detections made.
     '''
     try:

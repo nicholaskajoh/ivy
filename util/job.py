@@ -1,5 +1,5 @@
 '''
-Utilities for managing vehicle count jobs.
+Utilities for managing object count jobs.
 '''
 
 import os

@@ -3,7 +3,7 @@ from .bounding_box import get_centroid, get_area
 
 class Blob:
     '''
-    A blob object represents a tracked vehicle as it moves around in a video.
+    A blob represents a tracked object as it moves around in a video.
     '''
     def __init__(self, _bounding_box, _type, _confidence, _tracker):
         self.bounding_box = _bounding_box
@@ -14,7 +14,7 @@ class Blob:
         self.tracker = _tracker
         self.num_consecutive_tracking_failures = 0
         self.num_consecutive_detection_failures = 0
-        self.lines_crossed = [] # list of counting lines crossed by a vehicle
+        self.lines_crossed = [] # list of counting lines crossed by an object
         self.position_first_detected = tuple(self.centroid)
 
     def update(self, _bounding_box, _type=None, _confidence=None, _tracker=None):

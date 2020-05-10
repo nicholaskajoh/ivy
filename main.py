@@ -16,7 +16,7 @@ from util.logger import init_logger
 from util.image import take_screenshot
 from util.logger import get_logger
 from util.debugger import mouse_callback
-from VehicleCounter import VehicleCounter
+from ObjectCounter import ObjectCounter
 
 init_logger()
 logger = get_logger()
@@ -24,7 +24,7 @@ logger = get_logger()
 
 def run():
     '''
-    Initialize counter class and run counting loop.
+    Initialize object counter class and run counting loop.
     '''
 
     video = settings.VIDEO
@@ -50,7 +50,7 @@ def run():
     counting_lines = settings.COUNTING_LINES
     show_counts = settings.SHOW_COUNTS
 
-    vehicle_counter = VehicleCounter(frame, detector, tracker, droi, show_droi, mcdf,
+    object_counter = ObjectCounter(frame, detector, tracker, droi, show_droi, mcdf,
                                      mctf, detection_interval, counting_lines, show_counts)
 
     record = settings.RECORD
@@ -106,8 +106,8 @@ def run():
             _timer = cv2.getTickCount() # set timer to calculate processing frame rate
 
             if ret:
-                vehicle_counter.count(frame)
-                output_frame = vehicle_counter.visualize()
+                object_counter.count(frame)
+                output_frame = object_counter.visualize()
 
                 if record:
                     output_video.write(output_frame)
@@ -141,7 +141,7 @@ def run():
         logger.info('Processing ended.', extra={
             'meta': {
                 'label': 'END_PROCESS',
-                'counts': vehicle_counter.get_counts(),
+                'counts': object_counter.get_counts(),
             },
         })
 
