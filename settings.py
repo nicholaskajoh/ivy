@@ -202,6 +202,13 @@ except ValueError:
     print('Invalid value for DEBUG_WINDOW_SIZE. It should be a 2-tuple: (width, height).')
     ENVS_READY = False
 
+# Color of heads up display
+try:
+    HUD_COLOR = ast.literal_eval(os.getenv('HUD_COLOR', '(255, 0, 0)'))
+except ValueError:
+    print('Invalid value for HUD_COLOR. It should be a 3-tuple: (B, G, R).')
+    ENVS_READY = False
+
 
 if not ENVS_READY:
     raise Exception('One or more environment variables are either invalid or not set. ' +

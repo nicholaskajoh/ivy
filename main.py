@@ -49,9 +49,10 @@ def run():
     show_droi = settings.SHOW_DROI
     counting_lines = settings.COUNTING_LINES
     show_counts = settings.SHOW_COUNTS
+    hud_color = settings.HUD_COLOR
 
-    object_counter = ObjectCounter(frame, detector, tracker, droi, show_droi, mcdf,
-                                     mctf, detection_interval, counting_lines, show_counts)
+    object_counter = ObjectCounter(frame, detector, tracker, droi, show_droi, mcdf, mctf,
+                                   detection_interval, counting_lines, show_counts, hud_color)
 
     record = settings.RECORD
     if record:

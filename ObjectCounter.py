@@ -19,7 +19,7 @@ NUM_CORES = multiprocessing.cpu_count()
 
 class ObjectCounter():
 
-    def __init__(self, initial_frame, detector, tracker, droi, show_droi, mcdf, mctf, di, counting_lines, show_counts):
+    def __init__(self, initial_frame, detector, tracker, droi, show_droi, mcdf, mctf, di, counting_lines, show_counts, hud_color):
         self.frame = initial_frame # current frame of video
         self.detector = detector
         self.tracker = tracker
@@ -29,12 +29,12 @@ class ObjectCounter():
         self.mctf = mctf # maximum consecutive tracking failures
         self.detection_interval = di
         self.counting_lines = counting_lines
-
         self.blobs = {}
         self.f_height, self.f_width, _ = self.frame.shape
         self.frame_count = 0 # number of frames since last detection
         self.counts = {counting_line['label']: {} for counting_line in counting_lines} # counts of objects by type for each counting line
         self.show_counts = show_counts
+        self.hud_color = hud_color
 
         # create blobs from initial frame
         droi_frame = get_roi_frame(self.frame, self.droi)
@@ -85,17 +85,17 @@ class ObjectCounter():
         # draw and label blob bounding boxes
         for _id, blob in self.blobs.items():
             (x, y, w, h) = [int(v) for v in blob.bounding_box]
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), self.hud_color, 2)
             object_label = 'I: ' + _id[:8] \
                             if blob.type is None \
                             else 'I: {0}, T: {1} ({2})'.format(_id[:8], blob.type, str(blob.type_confidence)[:4])
-            cv2.putText(frame, object_label, (x, y - 5), font, 1, (255, 0, 0), 2, line_type)
+            cv2.putText(frame, object_label, (x, y - 5), font, 1, self.hud_color, 2, line_type)
 
         # draw counting lines
         for counting_line in self.counting_lines:
-            cv2.line(frame, counting_line['line'][0], counting_line['line'][1], (255, 0, 0), 3)
+            cv2.line(frame, counting_line['line'][0], counting_line['line'][1], self.hud_color, 3)
             cl_label_origin = (counting_line['line'][0][0], counting_line['line'][0][1] + 35)
-            cv2.putText(frame, counting_line['label'], cl_label_origin, font, 1, (255, 0, 0), 2, line_type)
+            cv2.putText(frame, counting_line['label'], cl_label_origin, font, 1, self.hud_color, 2, line_type)
 
         # show detection roi
         if self.show_droi:
@@ -105,10 +105,10 @@ class ObjectCounter():
         if self.show_counts:
             offset = 1
             for line, objects in self.counts.items():
-                cv2.putText(frame, line, (10, 40 * offset), font, 1, (255, 0, 0), 2, line_type)
+                cv2.putText(frame, line, (10, 40 * offset), font, 1, self.hud_color, 2, line_type)
                 for label, count in objects.items():
                     offset += 1
-                    cv2.putText(frame, "{}: {}".format(label, count), (10, 40 * offset), font, 1, (255, 0, 0), 2, line_type)
+                    cv2.putText(frame, "{}: {}".format(label, count), (10, 40 * offset), font, 1, self.hud_color, 2, line_type)
                 offset += 2
 
         return frame
