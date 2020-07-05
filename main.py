@@ -34,7 +34,7 @@ def run():
             'meta': {'label': 'INVALID_VIDEO_SOURCE'},
         })
         sys.exit()
-    ret, frame = cap.read()
+    retval, frame = cap.read()
     f_height, f_width, _ = frame.shape
     detection_interval = settings.DI
     mcdf = settings.MCDF
@@ -86,10 +86,12 @@ def run():
 
     is_paused = False
     output_frame = None
+    frames_count = round(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    frames_processed = 0
 
     try:
         # main loop
-        while cap.get(cv2.CAP_PROP_POS_FRAMES) + 1 < cap.get(cv2.CAP_PROP_FRAME_COUNT):
+        while retval:
             k = cv2.waitKey(1) & 0xFF
             if k == ord('p'): # pause/play loop if 'p' key is pressed
                 is_paused = False if is_paused else True
@@ -106,21 +108,19 @@ def run():
 
             _timer = cv2.getTickCount() # set timer to calculate processing frame rate
 
-            if ret:
-                object_counter.count(frame)
-                output_frame = object_counter.visualize()
+            object_counter.count(frame)
+            output_frame = object_counter.visualize()
 
-                if record:
-                    output_video.write(output_frame)
+            if record:
+                output_video.write(output_frame)
 
-                if not headless:
-                    debug_window_size = settings.DEBUG_WINDOW_SIZE
-                    resized_frame = cv2.resize(output_frame, debug_window_size)
-                    cv2.imshow('Debug', resized_frame)
+            if not headless:
+                debug_window_size = settings.DEBUG_WINDOW_SIZE
+                resized_frame = cv2.resize(output_frame, debug_window_size)
+                cv2.imshow('Debug', resized_frame)
 
             processing_frame_rate = round(cv2.getTickFrequency() / (cv2.getTickCount() - _timer), 2)
-            frames_processed = round(cap.get(cv2.CAP_PROP_POS_FRAMES))
-            frames_count = round(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            frames_processed += 1
             logger.debug('Frame processed.', extra={
                 'meta': {
                     'label': 'FRAME_PROCESS',
@@ -131,7 +131,7 @@ def run():
                 },
             })
 
-            ret, frame = cap.read()
+            retval, frame = cap.read()
     finally:
         # end capture, close window, close log file and video object if any
         cap.release()
@@ -143,6 +143,7 @@ def run():
             'meta': {
                 'label': 'END_PROCESS',
                 'counts': object_counter.get_counts(),
+                'completed': frames_count - frames_processed == 0,
             },
         })
 
