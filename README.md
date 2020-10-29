@@ -1,8 +1,6 @@
 # Ivy
 Ivy is an open-source video-based object counting software for tallying pretty much anything (vehicles, people, animals — you name it).
 
-> Need help processing and analyzing your videos? [Try Traffic Logic](https://trafficlogic.co).
-
 ![](object_counting.jpg)
 
 ## Requirements
