@@ -50,8 +50,8 @@ def get_bounding_boxes(image):
                 center_y = int(detection[1] * height)
                 w = int(detection[2] * width)
                 h = int(detection[3] * height)
-                x = center_x - w / 2
-                y = center_y - h / 2
+                x = int(center_x - w / 2)
+                y = int(center_y - h / 2)
                 classes.append(CLASSES[class_id])
                 confidences.append(float(confidence))
                 boxes.append([x, y, w, h])
