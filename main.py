@@ -96,7 +96,6 @@ def run():
 
     is_paused = False
     output_frame = None
-    frames_count = round(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     frames_processed = 0
 
     try:
@@ -129,21 +128,27 @@ def run():
                 resized_frame = cv2.resize(output_frame, debug_window_size)
                 cv2.imshow('Debug', resized_frame)
 
+            frames_count = round(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             processing_frame_rate = round(cv2.getTickFrequency() / (cv2.getTickCount() - _timer), 2)
             frames_processed += 1
             logger.debug('Frame processed.', extra={
                 'meta': {
                     'label': 'FRAME_PROCESS',
+                    'frames_count': frames_count,
                     'frames_processed': frames_processed,
-                    'frame_rate': processing_frame_rate,
+                    'processing_frame_rate': processing_frame_rate,
                     'frames_left': frames_count - frames_processed,
                     'percentage_processed': round((frames_processed / frames_count) * 100, 2),
+                    'time_in_seconds': round(cap.get(cv2.CAP_PROP_POS_MSEC) / 1000),
+                    'blobs': { blob_id: vars(blob) for blob_id, blob in object_counter.get_blobs().items() },
+                    'counts': object_counter.get_counts(),
                 },
             })
 
             retval, frame = cap.read()
     finally:
         # end capture, close window, close log file and video object if any
+        frames_count = round(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         cap.release()
         if not headless:
             cv2.destroyAllWindows()
