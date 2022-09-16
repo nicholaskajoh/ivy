@@ -28,11 +28,21 @@ def run():
     '''
 
     video = settings.VIDEO
+    wfc = settings.WAIT_FOR_CAPTURE
+    wfc_timeout = settings.WAIT_FOR_CAPTURE_TIMEOUT
+    waited_to_capture_for_seconds = 0
+    wait_for_seconds = 10
     cap = cv2.VideoCapture(video)
-    if not cap.isOpened():
+    while not cap.isOpened():
         logger.error('Invalid video source %s', video, extra={
             'meta': {'label': 'INVALID_VIDEO_SOURCE'},
         })
+        if wfc and waited_to_capture_for_seconds < wfc_timeout:
+            # wait and then try to capture again
+            time.sleep(wait_for_seconds)
+            waited_to_capture_for_seconds += wait_for_seconds
+            cap = cv2.VideoCapture(video)
+            continue
         sys.exit()
     retval, frame = cap.read()
     f_height, f_width, _ = frame.shape

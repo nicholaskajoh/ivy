@@ -16,6 +16,23 @@ else:
     print('Path to video file not set.')
     ENVS_READY = False
 
+# Wait for video file to be available instead of exiting immediately if it doesn't exist.
+# This is useful for when Ivy is used to process a video stream that has not yet started.
+try:
+    WAIT_FOR_CAPTURE = ast.literal_eval(os.getenv('WAIT_FOR_CAPTURE', 'False'))
+except ValueError:
+    print('Invalid value for WAIT_FOR_CAPTURE. It should be either True or False.')
+    ENVS_READY = False
+
+if WAIT_FOR_CAPTURE:
+    try:
+        WAIT_FOR_CAPTURE_TIMEOUT = int(os.getenv('WAIT_FOR_CAPTURE_TIMEOUT', '300')) # in seconds
+    except ValueError:
+        print('Invalid value for WAIT_FOR_CAPTURE_TIMEOUT. It should be a positive integer.')
+        ENVS_READY = False
+else:
+    WAIT_FOR_CAPTURE_TIMEOUT = 0
+
 # Specify a detection Region of Interest (ROI)
 # i.e a set of vertices that represent the area (polygon) where you want detections to be made
 # E.g [(750, 405), (1094, 398), (1569, 1028), (501, 1028)]
