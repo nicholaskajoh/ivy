@@ -4,11 +4,11 @@ Ivy is an open-source video-based object counting software for tallying pretty m
 ![](object_counting.jpg)
 
 ## Requirements
-- Python 3 (tested with versions 3.5, 3.6 and 3.7)
+- Python 3 (tested with version 3.7)
 
 ## Setup
 - Clone this repo `git@github.com:nicholaskajoh/ivy.git`.
-- Create and/or use a virtual environment (optional but recommended).
+- Create and/or use a virtual environment (optional but recommended) `mkvirtualenv -p python3.7 ivy`.
 - Install the dependencies in _requirements.txt_ `pip install -r requirements.txt`.
 - Choose a detector and install its dependencies where necessary (if you're not sure what to pick, we recommend you start with `yolo`).
 
@@ -22,6 +22,7 @@ Ivy is an open-source video-based object counting software for tallying pretty m
 ## Run
 - Create a _.env_ file (based on _.env.example_) in the project's root directory and edit as appropriate.
 - Run `python -m  main`.
+- Run using Docker `docker build -t nicholaskajoh/ivy .`.
 
 ## Demo
 Download [ivy_demo_data.zip](https://drive.google.com/open?id=1JtEhWlfk1CiUEFsrTQHQa0VkTi3IKbze) and unzip its contents in the [data directory](/data). It contains detection models and a sample video.
