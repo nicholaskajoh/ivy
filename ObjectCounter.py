@@ -42,10 +42,54 @@ class ObjectCounter():
         self.blobs = add_new_blobs(_bounding_boxes, _classes, _confidences, self.blobs, self.frame, self.tracker, self.mcdf)
 
     def get_counts(self):
-        return self.counts
+        '''
+        Format `self.counts` i.e
+
+        From:
+            {
+                A: {car: 1, bus: 2},
+                B: {car: 4, bicycle: 3},
+            }
+
+        To:
+            {
+                total_count: 10,
+                classes: [{class: car, count: 5}, {class: bus, count: 2}, {class: bicycle, count: 3}],
+                lines: [{line: A, count: 3}, {line: B, count: 7}]
+                lines_by_class: [{line: A, class: car, count: 1}, {line: A, class: bus, count: 2}, {line: B, class: car, count: 4}, {line: B, class: bicycle, count: 3}]
+            }
+        '''
+
+        classes = []
+        lines = []
+        lines_by_class = [] # flattened self.counts
+        total_count = 0
+        class_counts = {}
+
+        for line_label, counts_by_class in self.counts.items():
+            line_count = 0
+
+            for class_name, class_count in counts_by_class.items():
+                # classes
+                if class_name in class_counts:
+                    class_counts[class_name] += class_count
+                else:
+                    class_counts[class_name] = class_count
+                # lines
+                line_count += class_count
+                # lines by class
+                lines_by_class.append({'line': line_label, 'class': class_name, 'count': class_count})
+
+            lines.append({'line': line_label, 'count': line_count})
+            total_count += line_count
+
+        for class_name, class_count in class_counts.items():
+            classes.append({'class': class_name, 'count': class_count})
+
+        return {'total_count': total_count, 'classes': classes, 'lines': lines, 'lines_by_class': lines_by_class}
 
     def get_blobs(self):
-        return self.blobs
+        return [{'id': blob_id, 'details': vars(blob)} for blob_id, blob in self.blobs.items()]
 
     def count(self, frame):
         self.frame = frame

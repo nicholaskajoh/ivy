@@ -131,16 +131,19 @@ def run():
             frames_count = round(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             processing_frame_rate = round(cv2.getTickFrequency() / (cv2.getTickCount() - _timer), 2)
             frames_processed += 1
+            blobs = object_counter.get_blobs()
             logger.debug('Frame processed.', extra={
                 'meta': {
                     'label': 'FRAME_PROCESS',
                     'frames_count': frames_count,
                     'frames_processed': frames_processed,
+                    'video_frame_rate': round(cap.get(cv2.CAP_PROP_FPS), 2),
+                    'video_frame_size': {'width': f_width, 'height': f_height},
                     'processing_frame_rate': processing_frame_rate,
-                    'frames_left': frames_count - frames_processed,
                     'percentage_processed': round((frames_processed / frames_count) * 100, 2),
                     'time_in_seconds': round(cap.get(cv2.CAP_PROP_POS_MSEC) / 1000),
-                    'blobs': { blob_id: vars(blob) for blob_id, blob in object_counter.get_blobs().items() },
+                    'blobs': blobs,
+                    'blobs_count': len(blobs),
                     'counts': object_counter.get_counts(),
                 },
             })
